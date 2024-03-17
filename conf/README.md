@@ -1,6 +1,6 @@
 # CONF: Custom Optimization & Nuanced Functions
-### Universal Automation Script for Debian-Based Shell Environments
-####Version 4.0.4 | Developed by G0dKing
+## Universal Automation Script for Debian-Based Shell Environments
+### Version 4.0.4 | Developed by G0dKing
 
 ## I. Usage
 <p><i><b>Note:</b> This script has only been tested in Ubuntu 22.04 LTS and Ubuntu 23.10. Functionality is not guaranteed.</i></p>
