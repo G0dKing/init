@@ -7,11 +7,14 @@
 
 ### Step 1:
 <p>Open a new shell environment in the Terminal and execute the following commands:</p>
-``` git clone https://github.com/G0dKing/conf.git
+
+```
+git clone https://github.com/G0dKing/conf.git
 cd conf
 sudo chmod +x init.sh
 ./init.sh
 ```
+
 That's it!
 
 ## License
