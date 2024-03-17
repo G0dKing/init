@@ -18,4 +18,4 @@ sudo chmod +x init.sh
 That's it!
 
 ## II. License
-<p>This script is and will always remain Free and Open Source Software (FOSS) under the GNU Public License v.3, which can be viewed [here] (https://www.gnu.org/licenses/gpl-3.0.en.html#license-text).</p>
+<p>This script is and will always remain Free and Open Source Software (FOSS) under the GNU Public License v.3, which can be viewed [here](https://www.gnu.org/licenses/gpl-3.0.en.html#license-text).</p>
