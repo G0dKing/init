@@ -1,4 +1,4 @@
-# CONF: Custom Optimization & Nuanced Functions
+# CONF
 ## Universal Automation Script for Debian-Based Shell Environments
 ### Version 4.0.4 | Developed by G0dKing
 
