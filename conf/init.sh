@@ -1,4 +1,4 @@
-#!/bash/bin
+#!/bin/bash
 
 # Initialization Script for Debian-Based Linux Shells
 # ver. 4.0.4
