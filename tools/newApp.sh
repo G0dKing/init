@@ -57,7 +57,7 @@ check_dependencies() {
 init_newApp() {
     setup_log
     check_dependencies
-    if [[ $# -eq 0 ]]; then
+    if [[ $# == "" ]]; then
         clear
         read -p "Specify Project Directory (Default: './app'): " project
         project=${project:-"./app"}
