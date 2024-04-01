@@ -1,20 +1,30 @@
-# /root/.bashrc (WSL)
+# .bashrc
 
 # Initialize Functions
-scripts_dir=$HOME/scripts
-if [ -d "$scripts_dir" ]; then
-    for file in "${scripts_dir}"/*.{sh,conf,config}; do
-        [ -r "$file" ] && [ -f "$file" ] && . "$file"
-    done
-fi
+init_all() {
+    scripts_dir=$HOME/scripts
+    config_dir=$scripts_dir/files.config
+    tools_dir=$scripts_dir/tools
+    init_dir=$scripts_dir/init
+    wsl_dir=$scripts_dir/wsl
 
-# Initialize WSL Settings (If Applicable)
-wsl_dir=$scripts_dir/wsl
-if grep -qEi "(Microsoft|WSL)" /proc/version; then
-    for file in "$wsl_dir"/*.{sh,conf}; do
-        [ -r "$file" ] && [ -f "$file" ] && . "$file"
-    done
-fi
+    if [ -d "$scripts_dir" ]; then
+
+        for file in "$1"/*.{sh,conf,config}; do
+            [ -r "$file" ] && [ -f "$file" ] && . "$file"
+        done
+    fi
+    if grep -qEi "(Microsoft|WSL)" /proc/version; then
+        for file in "$wsl_dir"/*.{sh,conf}; do
+            [ -r "$file" ] && [ -f "$file" ] && . "$file"
+        done
+    fi
+}
+init_all $scripts_dir
+init_all $config_dir
+init_all $tools_dir
+init_all $init_dir
+
 
 # Initialize Secrets
 env=$HOME/.env

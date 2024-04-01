@@ -61,7 +61,6 @@ get_public_ipv6() {
     echo "Public IPv6: <FAILED>"
 }
 
-
 get_local_and_ipv6() {
     local interface local_ip
 
