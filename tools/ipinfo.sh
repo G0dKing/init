@@ -2,7 +2,7 @@
 
 # ipinfo.sh
 
-check_dependencies() {
+ipinfo_check_dependencies() {
     local missing=()
     local install_instructions=()
     for cmd in ip curl wget; do
@@ -104,6 +104,6 @@ fetch_ip() {
 }
 
 ipinfo() {
-    check_dependencies
+    ipinfo_check_dependencies
     fetch_ip
 }

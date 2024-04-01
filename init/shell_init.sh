@@ -26,13 +26,13 @@ setup_aliases() {
 }
 
 setup_colors() {
-    source ~/scripts/colors_init.sh
+    source ~/scripts/init/colors_init.sh
     colors_init
     return 0
 }
 
 setup_prompt() {
-    source ~/scripts/prompt_init.sh
+    source ~/scripts/init/prompt_init.sh
     prompt_init
     return 0
 }
