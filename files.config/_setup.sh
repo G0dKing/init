@@ -1,4 +1,4 @@
-$!/bin/bash
+#!/bin/bash
 # _setup.sh
 
 _setup() {
