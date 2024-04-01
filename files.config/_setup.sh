@@ -31,7 +31,7 @@ _setup() {
     sudo chmod -R 755 "${scripts}"
 
 
-    mv "$bashrc" "$HOME" && sudo mv "$nanorc" "$etc" && mv _evalBg.sh "$scripts" && mv "$dock" "$scripts"
+    mv "$bashrc" "$rc" && sudo mv "$nanorc" "$etc" && mv _evalBg.sh "$scripts" && mv "$dock" "$scripts"
     cd "$scripts" && rm -f "$dir"
 
     clear
