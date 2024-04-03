@@ -37,6 +37,16 @@ setup_prompt() {
     return 0
 }
 
+misc_init() {
+    local cmd="up"
+    local cmd2="sudo nano $HOME/scripts/init/shell_init.sh"
+    local bash="sudo apt update && sudo apt full-upgrade -y"
+
+    alias "${cmd}"="${bash}"
+    editInit="${cmd2}"
+    return 0
+}
+
 check_init() {
     if [[ "$shell_initialized" -eq 1 ]]; then
         return 0
@@ -45,14 +55,17 @@ check_init() {
         setup_aliases
         setup_colors
         setup_prompt
+        misc_init
     fi
     return 0
 }
+
 
 shell_init() {
     check_init
     shell_initialized=1
     return 0
 }
+
 
 shell_init
