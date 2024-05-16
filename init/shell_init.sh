@@ -1,17 +1,14 @@
 #!/bin/bash
-# ~/scripts/shell_init.sh
+# ~/g0dking/shell_init.sh
 
-setup_global_vars() {
+_init() {
     export user=$USER
     export home=$HOME
     export uid=$(id -u)
     export here=$(pwd)
     export parent=$(cd .. && pwd)
     export email=webmaster@alexpariah.com
-    return 0
-}
 
-setup_aliases() {
     alias c='clear'
     alias mkdir='mkdir -p'
     alias rm='rm -r'
@@ -22,50 +19,35 @@ setup_aliases() {
     alias ...='cd .. && cd ..'
     alias 00='cd /'
     alias 0='cd ~'
-    return 0
-}
 
-setup_colors() {
-    source ~/scripts/init/colors_init.sh
+    source ~/g0dking/init/colors_init.sh
     colors_init
-    return 0
-}
 
-setup_prompt() {
-    source ~/scripts/init/prompt_init.sh
-    prompt_init
-    return 0
-}
+    source ~/g0dking/init/prompt_init.sh
+    setprompt
 
-misc_init() {
     local cmd="up"
-    local cmd2="sudo nano $HOME/scripts/init/shell_init.sh"
+    local cmd2="sudo nano $HOME/g0dking/init/shell_init.sh"
     local bash="sudo apt update && sudo apt full-upgrade -y"
 
     alias "${cmd}"="${bash}"
     editInit="${cmd2}"
-    return 0
 }
 
 check_init() {
-    if [[ "$shell_initialized" -eq 1 ]]; then
-        return 0
-    else
-        setup_global_vars
-        setup_aliases
-        setup_colors
-        setup_prompt
-        misc_init
+    local passvar=$1
+    if [[ "$passvar" -ne 1 ]]; then
+        _init
+        complete=1
     fi
-    return 0
 }
 
 
-shell_init() {
-    check_init
-    shell_initialized=1
-    return 0
+initShell() {
+    local complete=$1
+    local passvar=$complete
+    check_init $passvar
 }
 
+initShell $complete
 
-shell_init

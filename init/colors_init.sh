@@ -1,9 +1,6 @@
 #!/bin/bash
 
 set_colors() {
-    if tput setaf 1 &> /dev/null; then
-        export colors_unsupported=0
-
         export nc="\033[0m"
         export black="\033[0;30m"
         export red="\033[0;31m"
@@ -61,68 +58,6 @@ set_colors() {
         export bg_purpler="\033[0;105m"
         export bg_cyaner="\033[0;106m"
         export bg_whiter="\033[0;107m"
-    else
-        export colors_unsupported=1
-        export nc=""
-        export black=""
-        export red=""
-        export green=""
-        export yellow=""
-        export blue=""
-        export purple=""
-        export cyan=""
-        export white=""
-        export bold_black=""
-        export bold_red=""
-        export bold_green=""
-        export bold_yellow=""
-        export bold_blue=""
-        export bold_purple=""
-        export bold_cyan=""
-        export bold_white=""
-        export line_black=""
-        export line_red=""
-        export line_green=""
-        export line_yellow=""
-        export line_blue=""
-        export line_purple=""
-        export line_cyan=""
-        export line_white=""
-        export bg_black=""
-        export bg_red=""
-        export bg_green=""
-        export bg_yellow=""
-        export bg_blue=""
-        export bg_purple=""
-        export bg_cyan=""
-        export bg_white=""
-        export blacker=""
-        export redder=""
-        export greener=""
-        export yellower=""
-        export bluer=""
-        export purpler=""
-        export cyaner=""
-        export whiter=""
-        export blackest=""
-        export reddest=""
-        export greenest=""
-        export yellowest=""
-        export bluest=""
-        export purplest=""
-        export cyanest=""
-        export whitest=""
-        export bg_blacker=""
-        export bg_redder=""
-        export bg_greener=""
-        export bg_yellower=""
-        export bg_bluer=""
-        export bg_purpler=""
-        export bg_cyaner=""
-        export bg_whiter=""
-    fi
-    
-    return 0
 }
 
 set_escape_codes() {
@@ -138,12 +73,9 @@ set_escape_codes() {
     export font_7="\033[17m"
     export font_8="\033[18m"
     export font_9="\033[19m"
-
-    return 0
 }
 
 set_symbols() {
- if tput setaf 1 &> /dev/null; then
         export sym_airplane=$(printf '\U2708')
         export sym_alarm=$(printf '\U23F0')
         export sym_angry=$(printf '\U1F620')
@@ -199,69 +131,11 @@ set_symbols() {
         export sym_wink=$(printf '\U1F609')
         export sym_yinyang=$(printf '\U262F')
         export sym_zzz=$(printf '\U1F4A4')
-  else
-        export sym_airplane=""
-        export sym_alarm=""
-        export sym_angry=""
-        export sym_basketball=""
-        export sym_bear=""
-        export sym_bicycle=""
-        export sym_bio=""
-        export sym_book=""
-        export sym_bus=""
-        export sym_car=""
-        export sym_cat=""
-        export sym_clap=""
-        export sym_coffee=""
-        export sym_dog=""
-        export sym_drum=""
-        export sym_earth=""
-        export sym_fire=""
-        export sym_football=""
-        export sym_fox=""
-        export sym_ghost=""
-        export sym_globe=""
-        export sym_guitar=""
-        export sym_heart=""
-        export sym_horse=""
-        export sym_laugh=""
-        export sym_lion=""
-        export sym_mail=""
-        export sym_medal=""
-        export sym_moon=""
-        export sym_motorcycle=""
-        export sym_mountain=""
-        export sym_mouse=""
-        export sym_music=""
-        export sym_nuke=""
-        export sym_panda=""
-        export sym_peace=""
-        export sym_saxophone=""
-        export sym_skull=""
-        export sym_smile=""
-        export sym_soccer=""
-        export sym_star=""
-        export sym_sun=""
-        export sym_sweat=""
-        export sym_think=""
-        export sym_thumbs_down=""
-        export sym_thumbs_up=""
-        export sym_tiger=""
-        export sym_train=""
-        export sym_trophy=""
-        export sym_unicorn=""
-        export sym_universe=""
-        export sym_volcano=""
-        export sym_wink=""
-        export sym_yinyang=""
-        export sym_zzz=""
-  fi
-  return 0
+
 }
 
 colors_init() {
     set_colors
     set_symbols
     set_escape_codes
-    return 0
 }

@@ -1,37 +1,49 @@
 #!/bin/bash
 
-set_prompt() {
-    if [[ "$colors_unsupported" -eq 1 ]]; then
-        symbol="@"
-        color1=""
-        color2=""
+# Applies default colors to shell prompt. To modify, run `setprompt $[COLOR_1] $[COLOR_2] $[EMOJI]`
+
+# Format user prompt
+_set_prompt() {
+    color1=$1
+    color2=$2
+    symbol=$3
+
+    if [[ "$uid" -eq 0 ]]; then
+        PS1="$color2|# $symbol$color1 root $color2$symbol #|$nc "
     else
-        symbol=$3
-        color1=$1
-        color2=$2
+        PS1="$color2|$ $color1\u $color2$|$nc "
     fi
-
-
-    PS1="$symbol $color1\u$color2 $|$nc: "
-
-
-    return 0
 }
 
-prompt_init() {
-    if [[ -z "$red" ]]; then
-        . ~/scripts/colors_init.sh
+# Load custom color variables
+_chkcolors() {
+    local script=$g0dking/init/colors_init.sh
+
+    if [[ -f "$script" ]]; then
+        . "$script"
         colors_init
     fi
-    if [[ ! -z "$color1" ]]; then
-        unset color1
-        unset color2
-        unset symbol
-    fi
-    if [[ "$uid" -eq 0 ]]; then
-        set_prompt $red $purple $sym_skull
-    else
-        set_prompt $purple $green $sym_bio
-    fi
-    return 0
 }
+
+# Apply colors to user prompt
+setprompt() {
+    if [[ "$#" -eq 0 ]]; then
+        if [[ "$EUID" -eq 0 ]]; then
+            local c1=$red
+            local c2=$yellow
+            local sym=$sym_skull
+        else
+            local c1=$purple
+            local c2=$green
+            local sym=$bio
+        fi
+    else
+        local c1=$1
+        local c2=$2
+        local sym=$3
+    fi
+    _chkcolors
+    _set_prompt "$c1" "$c2" "$sym"
+}
+
+setprompt
