@@ -9,9 +9,9 @@ _set_prompt() {
     symbol=$3
 
     if [[ "$uid" -eq 0 ]]; then
-        PS1="$color2|# $symbol$color1 root $color2$symbol #|$nc "
+        PS1="\[$color2\]|# \[$symbol\]\[$color1\] root \$[$color2\]\[$symbol\] #|\[$nc\] "
     else
-        PS1="$color2|$ $color1\u $color2$|$nc "
+        PS1="\[$color2\]|$\[$color1\] \u \[$color2\]$|\[$nc\] "
     fi
 }
 
