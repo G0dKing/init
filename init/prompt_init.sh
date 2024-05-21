@@ -4,14 +4,14 @@
 
 # Format user prompt
 _set_prompt() {
-    color1=$1
-    color2=$2
-    symbol=$3
+    local c1=$1
+    local c2=$2
+    local s0=$3
 
     if [[ "$uid" -eq 0 ]]; then
-        PS1="\[$color2\]|# \[$symbol\]\[$color1\] root \$[$color2\]\[$symbol\] #|\[$nc\] "
+        PS1="\[$c1\]root$\[$c2\]\[$s0\]|#\[$nc\] "
     else
-        PS1="\[$color2\]|$\[$color1\] \u \[$color2\]$|\[$nc\] "
+        PS1="\[$c2\]|$\[$c1\] \u \[$c2\]$|\[$nc\] "
     fi
 }
 
@@ -43,7 +43,7 @@ setprompt() {
         local sym=$3
     fi
     _chkcolors
-    _set_prompt "$c1" "$c2" "$sym"
+    _set_prompt "$green" "$purple" "$sym_nuke"
 }
 
 setprompt
