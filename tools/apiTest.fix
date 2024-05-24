@@ -1,0 +1,131 @@
+apiTest() {
+    # Create a temporary file to store user inputs
+    temp_file=$(mktemp)
+
+    # Collect input from the user using dialog
+    dialog --form "Enter API details" 15 50 0 \
+        "API Endpoint:" 1 1 "" 1 25 50 0 \
+        "Request Type (GET, POST, PUT, DELETE):" 2 1 "" 2 25 50 0 \
+        "API Key (leave blank if not needed):" 3 1 "" 3 25 50 0 \
+        "Query Parameters (name=value, leave blank to skip):" 4 1 "" 4 25 50 0 \
+        "Custom Headers (Header:Value, comma-separated, leave blank to skip):" 5 1 "" 5 25 50 0 \
+        "Output File for Response (leave blank to skip):" 6 1 "" 6 25 50 0 \
+        "Request Data (for POST, PUT as JSON string):" 7 1 "" 7 25 50 0 2> "$temp_file"
+
+    # Read the inputs from the temporary file
+    read -r api_endpoint request_type api_key query_params custom_headers output_file request_data < "$temp_file"
+
+    # Prepend localhost to the endpoint if it starts with "/"
+    if [[ "$api_endpoint" =~ ^/ ]]; then
+        api_endpoint="http://localhost$api_endpoint"
+    fi
+
+    # Validate the request data JSON format if request type is POST or PUT
+    if [[ "$request_type" == "POST" || "$request_type" == "PUT" ]]; then
+        if ! echo "$request_data" | jq empty; then
+            echo "Invalid JSON format for request data."
+            return 1
+        fi
+    fi
+
+    # Format the URL with the query parameters if provided
+    if [[ -n "$query_params" ]]; then
+        api_url="${api_endpoint}?${query_params}"
+    else
+        api_url="$api_endpoint"
+    fi
+
+    # Set up a temporary file for detailed trace output
+    trace_file=$(mktemp)
+
+    # Construct the curl command based on request type
+    curl_command="curl -s -w '\n\nHTTP Code: %{http_code}\nTotal Time: %{time_total}s\n' -o response.json -D headers.txt"
+
+    # Add headers if API key is provided
+    if [[ -n "$api_key" ]]; then
+        curl_command="$curl_command -H 'Authorization: Bearer $api_key'"
+    fi
+
+    # Add custom headers if provided
+    if [[ -n "$custom_headers" ]]; then
+        IFS=',' read -ra headers <<< "$custom_headers"
+        for header in "${headers[@]}"; do
+            curl_command="$curl_command -H '$header'"
+        done
+    fi
+
+    curl_command="$curl_command -H 'Content-Type: application/json' -H 'Accept: application/json' --trace-ascii '$trace_file'"
+
+    case "$request_type" in
+        GET)
+            curl_command="$curl_command '$api_url'"
+            ;;
+        POST)
+            curl_command="$curl_command -X POST -d '$request_data' '$api_url'"
+            ;;
+        PUT)
+            curl_command="$curl_command -X PUT -d '$request_data' '$api_url'"
+            ;;
+        DELETE)
+            curl_command="$curl_command -X DELETE '$api_url'"
+            ;;
+        *)
+            echo "Invalid request type: $request_type"
+            rm -f "$trace_file" "$temp_file"
+            return 1
+            ;;
+    esac
+
+    eval $curl_command
+
+    curl_exit_code=$?
+
+    # Extract HTTP code from the response
+    http_code=$(grep -oP 'HTTP Code: \K[0-9]+' response.json)
+
+    # Validate the response JSON format
+    if ! cat response.json | jq empty; then
+        echo "Invalid JSON format in response."
+    else
+        echo "Valid JSON format in response."
+        cat response.json | jq . > response_pretty.json
+        mv response_pretty.json response.json
+    fi
+
+    # Check if the API call was successful (HTTP status code 2xx)
+    if [[ "$curl_exit_code" -ne 0 ]]; then
+        echo "Network error occurred. curl exit code: $curl_exit_code"
+    elif [[ "$http_code" =~ ^2[0-9]{2}$ ]]; then
+        echo "API call was successful. HTTP Code: $http_code"
+    elif [[ "$http_code" =~ ^4[0-9]{2}$ ]]; then
+        echo "Client error occurred. HTTP Code: $http_code"
+    elif [[ "$http_code" =~ ^5[0-9]{2}$ ]]; then
+        echo "Server error occurred. HTTP Code: $http_code"
+    else
+        echo "Unexpected HTTP Code: $http_code"
+    fi
+
+    # Print the response headers
+    echo "Response Headers:"
+    cat headers.txt
+
+    # Print the response body
+    echo "Response Body:"
+    cat response.json
+
+    # Save the response to the output file if specified
+    if [[ -n "$output_file" ]]; then
+        cp response.json "$output_file"
+        echo "Response saved to $output_file"
+    fi
+
+    # Print the trace output
+    echo "Trace Output:"
+    cat "$trace_file"
+
+    # Clean up temporary files
+    rm -f headers.txt response.json "$trace_file" "$temp_file"
+}
+
+# Example usage
+apiTest

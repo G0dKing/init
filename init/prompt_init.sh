@@ -9,7 +9,7 @@ _set_prompt() {
     local s0=$3
 
     if [[ "$uid" -eq 0 ]]; then
-        PS1="\[$c1\]root$\[$c2\]\[$s0\]|#\[$nc\] "
+        PS1="\[$c1\]root\[$c2\]\[$s0\]|#\[$nc\] "
     else
         PS1="\[$c2\]|$\[$c1\] \u \[$c2\]$|\[$nc\] "
     fi
