@@ -1,6 +1,6 @@
-# G0dKing || ~/.bashrc || 5.15.24
+# G0dKing || ~/.bashrc || 5.31.24
 
-# >>> Init
+# Init
 [[ $- != *i* ]]
 export g0dking=$HOME/g0dking
 
@@ -32,56 +32,16 @@ init_env() {
 
 init_env
 
-# >>> Secrets
+# Secrets
 env=$HOME/.env
 if [[ -f "$env" ]]; then
     set -a; source "$env"; set +a
 fi
-
-# >>> Node Version Manager
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# >>> Docker
-DOCKER_DISTRO="Ubuntu"
-DOCKER_DIR=/mnt/wsl/shared-docker
-DOCKER_SOCK="$DOCKER_DIR/docker.sock"
-export DOCKER_HOST="unix://$DOCKER_SOCK"
-if [ ! -S "$DOCKER_SOCK" ]; then
-     mkdir -pm o=,ug=rwx "$DOCKER_DIR"
-     chgrp docker "$DOCKER_DIR"
-     /mnt/c/Windows/System32/wsl.exe -d $DOCKER_DISTRO sh -c "nohup sudo -b dockerd < /dev/null > $DOCKER_DIR/dockerd.log 2>&1"
-fi
-
-# >>> Rust
-. "$HOME/.cargo/env"
-
-# >>> Bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH=$BUN_INSTALL/bin:$PATH
-
-# >>> Anaconda
-__conda_setup="$('/home/seed/.conda/miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/seed/.conda/miniconda/etc/profile.d/conda.sh" ]; then
-        . "/home/seed/.conda/miniconda/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/seed/.conda/miniconda/bin:$PATH"
-    fi
-fi
-unset __conda_setup
 
 clone() {
     local repo=$1
     local url="https://github.com"
     local name="G0dKing"
     local cmd="git clone $url/$name/$repo.git"
-
     exec $cmd
 }
-
-
-# >>> END
