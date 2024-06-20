@@ -13,12 +13,12 @@ export PATH=$PATH:/mnt.c/Users/Administrator/Desktop
 
 # >>> WSL Navigation <<<
 # >>> Volumes <<<
-export win_c=/mnt/c
-export win_f=/mnt/f
-export win_g=/mnt/g
-alias cc='cd $win_c'
-alias ff='cd $win_f'
-alias gg='cd $win_g'
+export C=/mnt/c
+export F=/mnt/f
+export G=/mnt/g
+alias cc='cd $C'
+alias ff='cd $F'
+alias gg='cd $G'
 
 # >>> /c/ <<<
 export win_desktop="/mnt/c/Users/Administrator/Desktop"
@@ -55,7 +55,7 @@ winClip
 # >>> Functions to List Shortcuts <<<
 _shortcut_list() {
     local shortcuts=(
-        "WSL Shortcuts"
+        "WSL Navigation Shortcuts"
         ""
         "/ Volumes /"
         "Drive C: cc"
@@ -82,4 +82,27 @@ _shortcut_list() {
 show_wsl() {
     clear
     _shortcut_list
+}
+
+workon() {
+    local app=$1
+    local root="$G"/.dev/projects/active
+    local alt="$C"/dev/projects/active
+
+    if [[ ! -d "$root" ]]; then
+        local root="$alt"
+    fi
+
+    if [[ "$@" -eq 0 ]]; then
+        local dir="$root"
+    else
+        local dir="$root"/"$app"
+    fi
+
+    if [[ ! -d "$dir" ]]; then
+        mkdir -p "$dir"
+    fi
+
+    cd "$dir" || echo "Error: Could not locate project directory."
+
 }

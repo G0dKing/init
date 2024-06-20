@@ -8,7 +8,7 @@
 
 # For example: `mvall jpg png webp ~/image_dir` will move all files ending with .jpg, .png, and/or .webp to a directory called `image_dir` in the user's home folder.
 
-mvall() {
+move_all() {
     local target="${@: -1}"
     local filetypes=("${@:1:$#-1}")
 

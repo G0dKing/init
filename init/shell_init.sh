@@ -8,10 +8,11 @@ _init() {
     export here=$(pwd)
     export parent=$(cd .. && pwd)
     export email=webmaster@alexpariah.com
+    export scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
     alias c='clear'
     alias mkdir='mkdir -p'
-    alias rm='rm -r'
+    alias rm='rm -rf'
     alias cp='cp -r'
     alias echo='echo -e'
     alias ls='ls --color=auto'
