@@ -2,7 +2,7 @@
 
 # WSL Environment Configuration
 
-# >>> Add Windows Locations to PATH <<<
+# Add Windows Locations to PATH
 export PATH=$PATH:/mnt/c/Windows/System32
 export PATH=$PATH:/mnt/c/ffmpeg/bin
 export PATH=$PATH:/mnt/c/Python312
@@ -11,8 +11,9 @@ export PATH=$PATH:/mnt/c/Users/Administrator
 export PATH=$PATH:/mnt/c/Users/Administrator/.ssh
 export PATH=$PATH:/mnt.c/Users/Administrator/Desktop
 
-# >>> WSL Navigation <<<
-# >>> Volumes <<<
+# Navigation
+
+# Volumes
 export C=/mnt/c
 export F=/mnt/f
 export G=/mnt/g
@@ -20,7 +21,7 @@ alias cc='cd $C'
 alias ff='cd $F'
 alias gg='cd $G'
 
-# >>> /c/ <<<
+# /c/
 export win_desktop="/mnt/c/Users/Administrator/Desktop"
 export win_dl="/mnt/c/Users/Administrator/Downloads"
 export win_user="/mnt/c/Users/Administrator"
@@ -32,7 +33,7 @@ alias c2='cd $win_desktop'
 alias c3='cd $win_dl'
 alias c4='cd $win_ssh'
 
-# >>> /g/ <<<
+# /g/
 export win_dev="/mnt/g/.dev"
 export win_sites="/mnt/g/.dev/sites"
 export win_active='/mnt/g/.dev/projects/current'
@@ -40,7 +41,7 @@ alias g0='$win_active'
 alias g1='$win_dev'
 alias g2='$win_sites'
 
-# >>> Enable Shared Clipboard
+# Enable Shared Clipboard
 winClip() {
     local target=$1
     local copy_=copy
@@ -52,8 +53,8 @@ winClip() {
 
 winClip
 
-# >>> Functions to List Shortcuts <<<
-_shortcut_list() {
+# Functions to List Shortcuts
+wsl_shortcut_list() {
     local shortcuts=(
         "WSL Navigation Shortcuts"
         ""

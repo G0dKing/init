@@ -8,13 +8,18 @@ chk_if_root() {
     local uid=$(id -u)
     if [[ "$uid" -ne 0 ]]; then
         echo "Error: Access denied. Try again as root."
-        exit 1
+        return 1
     fi
 }
 
 error() {
-    local err_msg=$1
-    echo "Error: $err_msg" >&2
+    local msg=$1
+    if [[ -z "$msg" ]]; then
+        local err_msg="An unknown error has occurred. Exiting."
+    else
+        local err_msg="Error: ${msg}"
+    fi
+    echo "$err_msg" >&2
     return 1
 }
 
@@ -58,7 +63,7 @@ new_backup() {
         cp "$file" "${file}.$(date +'%Y%m%d%H%M%S').bak"
     fi
 }
-0
+
 # Usage: yes_no ["STRING"]
 yes_no() {
     local prompt="$1"
@@ -85,7 +90,7 @@ chk_if_dir() {
     fi
 }
 
-chk_chars() {
+chk_if_email() {
     local chars="$1"
     if [[ "$chars" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
         echo "Valid characters."

@@ -8,7 +8,7 @@ _init() {
     export here=$(pwd)
     export parent=$(cd .. && pwd)
     export email=webmaster@alexpariah.com
-    export scriptdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    export origin_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
     alias c='clear'
     alias mkdir='mkdir -p'
@@ -27,28 +27,27 @@ _init() {
     source ~/g0dking/init/prompt_init.sh
     setprompt
 
+    source ~/g0dking/tools/common.sh
+
     local cmd="up"
-    local cmd2="sudo nano $HOME/g0dking/init/shell_init.sh"
+    local cmd2="nano $HOME/g0dking/init/shell_init.sh"
+    local cmd3="list_common"
     local bash="sudo apt update && sudo apt full-upgrade -y"
 
     alias "${cmd}"="${bash}"
-    editInit="${cmd2}"
+    alias edit_init="${cmd2}"
+    alias common="${cmd3}"
+
+    export complete=1
 }
 
-check_init() {
-    local passvar=$1
-    if [[ "$passvar" -ne 1 ]]; then
+chk_if_run() {
+    local complete=$1
+    if [[ "$complete" -ne 1 ]]; then
         _init
-        complete=1
     fi
 }
 
 
-initShell() {
-    local complete=$1
-    local passvar=$complete
-    check_init $passvar
-}
-
-initShell $complete
+chk_if_run $complete
 
