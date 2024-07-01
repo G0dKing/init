@@ -1,30 +1,21 @@
 #!/bin/bash
-# ~/scripts/acquire.sh
-# ver. 1.0.0
-
-# Usage: Source this script in "~/.bashrc" then execute the following command: "acquire [TARGET]"!
 
 acquire() {
-    user=$(whoami)
-    target=$1
-    color1=$green
-    color2=$blue
-    color3=$red
+    local user=$(whoami)
+    local target=$1
 
-    if [ $# -eq 0 ]; then
-        echo "Error: Unspecified Target. Pass file or directory as argument when running this script."
-        return 1
-    else
-        if [ ! -e "$target" ]; then
-            echo "Error: The file or directory does not exist."
-            return 1
-        else
-            sudo chown -R "$user":"$user" "$target"
-            sudo chmod 755 -R "$target"
-            if [[ "$target" == "." ]]; then
-                target=$(pwd)
-            fi
-            echo "Success: Permissions for $target have been been set to Public, and the Owner set to $user."
-        fi
+    if [ -z "$target" ] || [ "$target" == "." ]; then
+        target=$(pwd)
     fi
+
+    if [ ! -e "$target" ]; then
+        echo "${red}Error${nc}: The file or directory does not exist."
+        return 1
+    fi
+
+    sudo chown -R "$user":"$user" "$target"
+    sudo chmod 755 -R "$target"
+    echo
+    echo "   ${green}SUCCESS${nc}: ${yellow}Permissions for ${red}$target${yellow} have been set.${nc}"
+    echo
 }
