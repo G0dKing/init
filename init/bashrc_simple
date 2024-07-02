@@ -1,10 +1,24 @@
-# G0dKing || ~/.bashrc || 5.31.24
+# G0dKing || ~/.bashrc || 7.2.24
 
-# Init
 [[ $- != *i* ]]
 export g0dking=$HOME/g0dking
 
+# Network Variables
+export pdanet_host_ip=192.168.49.232
+export pdanet_gateway=192.168.49.1
+export pdanet_proxy_port=8000
+export pdanet_proxy="${pdanet_gateway}:${pdanet_proxy_port}"
+
+# Functions
+
+# List Users
+list_users() {
+    awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
+}
+
+# Initialize Environment
 init_env() {
+
     # Set Vars
     local is_wsl=0
     local dirs=(
@@ -12,10 +26,12 @@ init_env() {
         "$g0dking/init"
         "$g0dking/init/wsl"
     )
+
     # Check if WSL
     if grep -qEi '(Microsoft|WSL)' /proc/version; then
         is_wsl=1
     fi
+
     # Source Functions
     for dir in "${dirs[@]}"; do
         if [ -d "$dir" ]; then
@@ -29,14 +45,17 @@ init_env() {
         fi
     done
 }
-
 init_env
 
 # Secrets
-env=$HOME/.env
-if [[ -f "$env" ]]; then
-    set -a; source "$env"; set +a
-fi
+secrets() {
+    local env=$HOME/.env
+    if [[ -f "$env" ]]; then
+        set -a; source "$env"; set +a
+    fi
+}
+
+secrets
 
 clone() {
     local repo=$1
