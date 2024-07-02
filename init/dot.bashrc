@@ -11,14 +11,8 @@ export pdanet_proxy="${pdanet_gateway}:${pdanet_proxy_port}"
 
 # Functions
 
-# List Users
-list_users() {
-    awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
-}
-
 # Initialize Environment
 init_env() {
-
     # Set Vars
     local is_wsl=0
     local dirs=(
@@ -26,12 +20,10 @@ init_env() {
         "$g0dking/init"
         "$g0dking/init/wsl"
     )
-
     # Check if WSL
     if grep -qEi '(Microsoft|WSL)' /proc/version; then
         is_wsl=1
     fi
-
     # Source Functions
     for dir in "${dirs[@]}"; do
         if [ -d "$dir" ]; then
@@ -54,8 +46,33 @@ secrets() {
         set -a; source "$env"; set +a
     fi
 }
-
 secrets
+
+setup_dns() {
+    local file="/etc/resolv.conf"
+    local domains=(
+        "1.1.1.1"
+        "1.0.0.1"
+        "8.8.8.8"
+        "8.8.4.4"
+    )
+
+    if [[ ! -f "$file" ]]; then
+        sudo touch $file
+    fi
+
+    for dns in "${domains[@]}"; do
+        if ! grep -q "nameserver ${dns}" "$file"; then
+            echo "nameserver ${dns}" | sudo tee -a "$file" >/dev/null
+        fi
+    done
+}
+
+# List Users
+list_users() {
+    awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
+}
+
 
 clone() {
     local repo=$1
