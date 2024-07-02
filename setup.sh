@@ -202,5 +202,3 @@ setup() {
     clear
     exec bash
 }
-
-setup
