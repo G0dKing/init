@@ -4,7 +4,7 @@ setup_repo() {
 if [[ ! -d "$dir" ]]; then
     local dir="$HOME/g0dking"
     local repo="https://github.com/g0dking/init.git"
-    local cmd="git clone $repo"    
+    local cmd="git clone $repo"
     cd $HOME
     echo -n "Repository not found. Cloning..."
     exec $cmd &>/dev/null &
@@ -80,7 +80,7 @@ setup_packages() {
 
     for package in "${packages[@]}"; do
         if ! command -v $package &>/dev/null; then
-            echo -e "Installing...    | $package"
+            echo -e "Installing...    | $package\r"
             sudo apt install -y $package &>/dev/null &
             spinner $!
             wait $!
@@ -96,13 +96,13 @@ setup_packages() {
 
 setup_nvm() {
     local url=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh
-    
+
     echo -n "Installing Node Version Manager..."
     if ! command -v "nvm" &>/dev/null; then
         curl -o- $url &>/dev/null | bash &>/dev/null >&2 &
         spinner $!
         wait
-        echo "Success."       
+        echo "Success."
     else
         echo "Node Version Manager is already installed."
     fi
@@ -110,7 +110,7 @@ setup_nvm() {
 
 setup_conda() {
     if ! command -v "conda" &>/dev/null; then
-        echo -n "Installing Conda..."
+        echo -n "Installing MiniConda..."
         wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3-latest-Linux-x86_64.sh &>/dev/null &
         spinner $!
         wait
@@ -118,9 +118,9 @@ setup_conda() {
         spinner $!
         wait
         rm -f Miniconda3-latest-Linux-x86_64.sh
-        echo "Success."        
+        echo "Success."
      else
-        echo "Conda is already installed."
+        echo "MiniConda is already installed."
      fi
 }
 
@@ -166,11 +166,11 @@ setup_shell() {
 
 setup_permissions() {
     local dir=$HOME/g0dking
-    local file=$dir/init/bashrc
+    local file=$dir/init/dot.bashrc
     local active_file=$HOME/.bashrc
     local config=$dir/init/nanorc
     local active_config=/etc/nanorc
-    
+
     sudo chown -R $USER:$USER "$dir" || echo "Error: Could not modify permissions." && return 1    
     sudo cp $file $active_file || echo "Error: Could not copy .bashrc file." && return 1
     sudo cp $config $active_config || echo "Error: Could not copy nanorc file." && return 1
@@ -186,7 +186,6 @@ execute() {
     setup_conda
     setup_bun
     setup_rust
-    
 }
 
 setup() {
@@ -197,6 +196,7 @@ setup() {
     sleep 5
     clear
     echo "Operation Complete"
+    sleep 2
     echo "The configuration has been successfully applied. The shell session will now reload."
     sleep 5
     clear
