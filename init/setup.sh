@@ -202,3 +202,25 @@ setup() {
     clear
     exec bash
 }
+
+yn_prompt() {
+    local prompt="$1"
+    local valid=0
+    while [ $valid -eq 0 ]; do
+        read -p "$prompt (y/n): " -r
+        echo
+        if [[ $REPLY =~ ^[Yy]([Ee][Ss])?$ ]]; then
+            local valid=1
+            _setup
+        elif [[ $REPLY =~ ^[Nn][Oo]?$ ]]; then
+            clear
+            return 0
+        else
+            echo "Error: Selection invalid. Please enter [y]es or [n]o."
+        fi
+    done
+}
+
+setup() {
+    yn_prompt "Re-initialize the environment and install custom functions?"
+}
