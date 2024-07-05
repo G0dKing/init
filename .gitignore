@@ -2,3 +2,7 @@
 .inactive
 .old
 .backup
+<<<<<<< HEAD
+=======
+.env
+>>>>>>> 801369d497eccdaca86884886e4bbe86e32ba143
