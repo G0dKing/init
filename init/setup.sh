@@ -37,7 +37,7 @@ spinner() {
     local pid=$1
     local delay=0.1
     local spinstr='|/-\'
-    tput civis
+    tput civis 
     while ps -p "$pid" > /dev/null 2>&1; do
         local temp=${spinstr#?}
         printf " [%c]  " "$spinstr"
@@ -86,7 +86,7 @@ setup_packages() {
             wait $!
             echo -n -e "\rInstalled    | $package\n"
         else
-            echo -n -e "Installed    | $package\r"
+            echo -n -e "\rInstalled    | $package\n"
         fi
     done
     echo
@@ -202,5 +202,3 @@ setup() {
     clear
     exec bash
 }
-
-setup
