@@ -11,6 +11,7 @@ chk_if_run() {
 }
 
 setup_repo() {
+local dir=$HOME/g0dking
 if [[ ! -d "$dir" ]]; then
     local dir="$HOME/g0dking"
     local repo="https://github.com/g0dking/init.git"
