@@ -1,5 +1,15 @@
 #!/bin/bash
 
+chk_if_run() {
+    local chkfile=$HOME/.init_complete
+    if [[ -f "$chkfile" ]]; then
+        echo "NOTE: The initialization script has already been run on this system. To re-run, delete '.init_complete' in the user's home directory."
+        return 1
+    else
+        _setup
+    fi
+}
+
 setup_repo() {
 if [[ ! -d "$dir" ]]; then
     local dir="$HOME/g0dking"
@@ -189,6 +199,7 @@ execute() {
 }
 
 setup() {
+    local chkfile=$HOME/.init_complete
     clear
     echo "Initializing..."
     sleep 3
@@ -199,6 +210,7 @@ setup() {
     sleep 2
     echo "The configuration has been successfully applied. The shell session will now reload."
     sleep 5
+    touch $chkfile
     clear
     exec bash
 }
@@ -211,10 +223,10 @@ yn_prompt() {
         echo
         if [[ $REPLY =~ ^[Yy]([Ee][Ss])?$ ]]; then
             local valid=1
-            _setup
+            chk_if_run
         elif [[ $REPLY =~ ^[Nn][Oo]?$ ]]; then
             clear
-            return 0
+            return 1
         else
             echo "Error: Selection invalid. Please enter [y]es or [n]o."
         fi
