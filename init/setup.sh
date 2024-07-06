@@ -11,6 +11,7 @@ chk_if_run() {
 }
 
 setup_repo() {
+local dir=$HOME/g0dking
 if [[ ! -d "$dir" ]]; then
     local dir="$HOME/g0dking"
     local repo="https://github.com/g0dking/init.git"
@@ -90,13 +91,13 @@ setup_packages() {
 
     for package in "${packages[@]}"; do
         if ! command -v $package &>/dev/null; then
-            echo -e "Installing...    | $package\r"
+            printf "Installing...    | $package/r"
             sudo apt install -y $package &>/dev/null &
             spinner $!
             wait $!
-            echo -n -e "\rInstalled    | $package\n"
+            printf "\rInstalled    | $package\n"
         else
-            echo -n -e "\rInstalled    | $package\n"
+            printf "\rInstalled    | $package\n"
         fi
     done
     echo
