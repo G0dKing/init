@@ -121,3 +121,7 @@ chk_cmd() {
         echo "$name is already installed."
     fi
 }
+
+list_users() {
+    awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd
+}

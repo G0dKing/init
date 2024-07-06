@@ -117,7 +117,7 @@ fetch_ip() {
 }
 
 ipinfo() {
-    local file=$HOME/g0dking/init/colors.sh
+    local file=$HOME/g0dking/init/colors.config
     FAIL="${bg_red}UNAVAILABLE${nc}"
 
     if [[ -z "$bg_red" ]]; then

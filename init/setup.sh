@@ -1,7 +1,7 @@
 #!/bin/bash
 
 chk_if_run() {
-    local chkfile=$HOME/.init_complete
+    local chkfile=/root/.init_complete
     if [[ -f "$chkfile" ]]; then
         echo "NOTE: The initialization script has already been run on this system. To re-run, delete '.init_complete' in the user's home directory."
         return 1
@@ -11,9 +11,7 @@ chk_if_run() {
 }
 
 setup_repo() {
-local dir=$HOME/g0dking
 if [[ ! -d "$dir" ]]; then
-    local dir="$HOME/g0dking"
     local repo="https://github.com/g0dking/init.git"
     local cmd="git clone $repo"
     cd $HOME
@@ -76,7 +74,9 @@ setup_packages() {
         net-tools
         nginx
         python3-certbot-nginx
-        python3-full
+        python3-pip
+        python3-venv
+        python3
         ssh
         tar
         thefuck
@@ -84,6 +84,10 @@ setup_packages() {
         unzip
         vim
         wget
+        iptables
+        nmap
+        proxychains4
+        tor
     )
 
     echo "Installing packages..."
@@ -91,13 +95,13 @@ setup_packages() {
 
     for package in "${packages[@]}"; do
         if ! command -v $package &>/dev/null; then
-            printf "Installing...    | $package/r"
+            echo -e "Installing...    | $package/r"
             sudo apt install -y $package &>/dev/null &
             spinner $!
             wait $!
-            printf "\rInstalled    | $package\n"
+            echo -e "\rInstalled    | $package\n"
         else
-            printf "\rInstalled    | $package\n"
+            echo -e "\rInstalled    | $package\n"
         fi
     done
     echo
@@ -167,7 +171,7 @@ setup_wsl() {
 }
 
 setup_shell() {
-    echo -n "Checking for updates..."
+    echo "Checking for updates..."
     sudo apt update &>/dev/null &
     spinner $!
     wait
@@ -176,13 +180,12 @@ setup_shell() {
 }
 
 setup_permissions() {
-    local dir=$HOME/g0dking
     local file=$dir/init/dot.bashrc
     local active_file=$HOME/.bashrc
     local config=$dir/init/nanorc
     local active_config=/etc/nanorc
 
-    sudo chown -R $USER:$USER "$dir" || echo "Error: Could not modify permissions." && return 1    
+    sudo chown -R $USER:$USER "$dir" || echo "Error: Could not modify permissions." && return 1
     sudo cp $file $active_file || echo "Error: Could not copy .bashrc file." && return 1
     sudo cp $config $active_config || echo "Error: Could not copy nanorc file." && return 1
 }
@@ -200,7 +203,8 @@ execute() {
 }
 
 _setup() {
-    local chkfile=$HOME/.init_complete
+    dir=${1:-$HOME/g0dking}
+    local chkfile=$/root/.init_complete
     clear
     echo "Initializing..."
     sleep 3
@@ -211,7 +215,7 @@ _setup() {
     sleep 2
     echo "The configuration has been successfully applied. The shell session will now reload."
     sleep 5
-    touch $chkfile
+    sudo touch $chkfile
     clear
     exec bash
 }
@@ -235,5 +239,5 @@ yn_prompt() {
 }
 
 setup() {
-    yn_prompt "Re-initialize the environment and install custom functions?"
+    yn_prompt "Apply custom configurations to shell (cannot be reversed)?"
 }
