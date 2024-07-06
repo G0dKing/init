@@ -47,7 +47,7 @@ spinner() {
     local delay=0.1
     local spinstr='|/-\'
     tput civis
-    while ps -p "$pid" > /dev/null 2>&1; do
+    while ps -p "$pid"; do
         local temp=${spinstr#?}
         printf " [%c]  " "$spinstr"
         local spinstr=$temp${spinstr%"$temp"}
@@ -74,9 +74,7 @@ setup_packages() {
         net-tools
         nginx
         python3-certbot-nginx
-        python3-pip
-        python3-venv
-        python3
+        python3-full
         ssh
         tar
         thefuck
@@ -95,13 +93,13 @@ setup_packages() {
 
     for package in "${packages[@]}"; do
         if ! command -v $package &>/dev/null; then
-            echo -e "Installing...    | $package/r"
-            sudo apt install -y $package &>/dev/null &
+            printf "Installing...    | $package/r"
+            sudo apt install -y $package &>/dev/null
             spinner $!
-            wait
-            echo -e "\rInstalled    | $package\n"
+            wait $!
+            printf "Installed    | $package\n"
         else
-            echo -e "\rInstalled    | $package\n"
+            printf "Installed    | $package\n"
         fi
     done
     echo
@@ -114,9 +112,9 @@ setup_nvm() {
 
     echo -n "Installing Node Version Manager..."
     if ! command -v "nvm" &>/dev/null; then
-        curl -o- $url &>/dev/null | bash &>/dev/null >&2 &
+        curl -o- $url &>/dev/null | bash &>/dev/null >&2
         spinner $!
-        wait
+        wait $!
         echo "Success."
     else
         echo "Node Version Manager is already installed."
@@ -126,7 +124,7 @@ setup_nvm() {
 setup_conda() {
     if ! command -v "conda" &>/dev/null; then
         echo -n "Installing MiniConda..."
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3-latest-Linux-x86_64.sh &>/dev/null &
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3-latest-Linux-x86_64.sh &>/dev/null
         spinner $!
         wait
         bash Miniconda3-latest-Linux-x86_64.sh -b &>/dev/null
@@ -142,7 +140,7 @@ setup_conda() {
 setup_bun() {
     if ! command -v "bun" &>/dev/null; then
         echo -n "Installing Bun..."
-        curl -fsSL https://bun.sh/install | bash &>/dev/null &
+        curl -fsSL https://bun.sh/install | bash &>/dev/null
         spinner $!
         wait
         echo "Success."
@@ -154,7 +152,7 @@ setup_bun() {
 setup_rust() {
     echo -n "Installing Rust..."
     if ! command -v "rustrc" &>/dev/null; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null &
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null
         spinner $!
         wait
         echo "Success."
