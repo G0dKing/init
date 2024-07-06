@@ -3,7 +3,7 @@
 
 set_prompt() {
     local user=$(whoami)
-   
+
     if [[ "$user" == "root" ]]; then
         color1=$yellow
         color2=$red
@@ -17,8 +17,8 @@ set_prompt() {
         frame2="$|"
         symbol=""
     fi
-    
-    PS1="$color1$frame1$color2 \u $color1$frame2$nc"
+
+    PS1="\[$color1\]$frame1\[$color2\] \u \[$color1\]$frame2\[$nc\]"
 }
 
 set_prompt

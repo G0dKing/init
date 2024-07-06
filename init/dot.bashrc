@@ -3,15 +3,27 @@
 [[ $- != *i* ]]
 export g0dking=$HOME/g0dking
 
+# General
+alias c='clear'
+alias mkdir='mkdir -p'
+alias la='ls -a'
+alias ll='ls'
+alias cp='cp -r'
+alias rm='rm -rf'
+
 # Network Variables
 export pdanet_host_ip=192.168.49.232
 export pdanet_gateway=192.168.49.1
 export pdanet_proxy_port=8000
 export pdanet_proxy="${pdanet_gateway}:${pdanet_proxy_port}"
 
+
 # Functions
 
 # Initialize Environment
+source $HOME/g0dking/init/colors.sh
+source $HOME/g0dking/init/prompt.sh
+
 init_env() {
     # Set Vars
     local is_wsl=0

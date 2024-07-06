@@ -16,6 +16,6 @@ acquire() {
     sudo chown -R "$user":"$user" "$target"
     sudo chmod 755 -R "$target"
     echo
-    echo "   ${green}SUCCESS${nc}: ${yellow}Permissions for ${red}$target${yellow} have been set.${nc}"
+    echo -e "   ${green}SUCCESS${nc}: ${yellow}Permissions for ${red}$target${yellow} have been set.${nc}"
     echo
 }

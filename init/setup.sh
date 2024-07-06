@@ -198,7 +198,7 @@ execute() {
     setup_rust
 }
 
-setup() {
+_setup() {
     local chkfile=$HOME/.init_complete
     clear
     echo "Initializing..."
