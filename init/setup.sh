@@ -46,7 +46,7 @@ spinner() {
     local pid=$1
     local delay=0.1
     local spinstr='|/-\'
-    tput civis 
+    tput civis
     while ps -p "$pid" > /dev/null 2>&1; do
         local temp=${spinstr#?}
         printf " [%c]  " "$spinstr"
@@ -98,7 +98,7 @@ setup_packages() {
             echo -e "Installing...    | $package/r"
             sudo apt install -y $package &>/dev/null &
             spinner $!
-            wait $!
+            wait
             echo -e "\rInstalled    | $package\n"
         else
             echo -e "\rInstalled    | $package\n"
@@ -129,7 +129,7 @@ setup_conda() {
         wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3-latest-Linux-x86_64.sh &>/dev/null &
         spinner $!
         wait
-        bash Miniconda3-latest-Linux-x86_64.sh -b &>/dev/null &
+        bash Miniconda3-latest-Linux-x86_64.sh -b &>/dev/null
         spinner $!
         wait
         rm -f Miniconda3-latest-Linux-x86_64.sh
@@ -153,7 +153,7 @@ setup_bun() {
 
 setup_rust() {
     echo -n "Installing Rust..."
-    if ! command -v "rustrc" &>/dev/null; then        
+    if ! command -v "rustrc" &>/dev/null; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null &
         spinner $!
         wait
@@ -172,7 +172,7 @@ setup_wsl() {
 
 setup_shell() {
     echo "Checking for updates..."
-    sudo apt update &>/dev/null &
+    sudo apt update &>/dev/null
     spinner $!
     wait
     echo "Success."
