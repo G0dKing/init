@@ -11,19 +11,18 @@ chk_if_run() {
 }
 
 setup_repo() {
-if [[ ! -d "$dir" ]]; then
-    local repo="https://github.com/g0dking/init.git"
-    local cmd="git clone $repo"
-    cd $HOME
-    echo -n "Repository not found. Cloning..."
-    exec $cmd &>/dev/null &
-    wait
-    sudo chown -R $USER:$USER init
-    sudo chmod -R 755 init
-    cp -r init g0dking
-    rm -rf init
-    echo "Success."
- fi
+    if [[ ! -d "$dir" ]]; then
+        local repo="https://github.com/g0dking/init.git"
+        local cmd="git clone $repo"
+        cd $HOME
+        echo -n "Repository not found. Cloning..."
+        $cmd &>/dev/null  # Removed exec and wait for background processes
+        sudo chown -R $USER:$USER init
+        sudo chmod -R 755 init
+        cp -r init g0dking
+        rm -rf init
+        echo "Success."
+    fi
 }
 
 setup_wsl_conf() {
@@ -47,10 +46,10 @@ spinner() {
     local delay=0.1
     local spinstr='|/-\'
     tput civis
-    while ps -p "$pid"; do
+    while ps -p "$pid" > /dev/null; do  # Corrected the while loop condition
         local temp=${spinstr#?}
         printf " [%c]  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
+        spinstr=$temp${spinstr%"$temp"}
         sleep $delay
         printf "\b\b\b\b\b\b"
     done
@@ -93,13 +92,13 @@ setup_packages() {
 
     for package in "${packages[@]}"; do
         if ! command -v $package &>/dev/null; then
-            printf "Installing...    | $package/r"
-            sudo apt install -y $package &>/dev/null
+            printf "Installing...    | $package\r"
+            sudo apt install -y $package &>/dev/null &
             spinner $!
             wait $!
-            printf "Installed    | $package\n"
+            printf "\rInstalled    | $package\n"
         else
-            printf "Installed    | $package\n"
+            printf "\rInstalled    | $package\n"
         fi
     done
     echo
@@ -112,7 +111,7 @@ setup_nvm() {
 
     echo -n "Installing Node Version Manager..."
     if ! command -v "nvm" &>/dev/null; then
-        curl -o- $url &>/dev/null | bash &>/dev/null >&2
+        curl -o- $url &>/dev/null | bash &>/dev/null &
         spinner $!
         wait $!
         echo "Success."
@@ -124,23 +123,23 @@ setup_nvm() {
 setup_conda() {
     if ! command -v "conda" &>/dev/null; then
         echo -n "Installing MiniConda..."
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3-latest-Linux-x86_64.sh &>/dev/null
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3-latest-Linux-x86_64.sh &>/dev/null &
         spinner $!
         wait
-        bash Miniconda3-latest-Linux-x86_64.sh -b &>/dev/null
+        bash Miniconda3-latest-Linux-x86_64.sh -b &>/dev/null &
         spinner $!
         wait
         rm -f Miniconda3-latest-Linux-x86_64.sh
         echo "Success."
-     else
+    else
         echo "MiniConda is already installed."
-     fi
+    fi
 }
 
 setup_bun() {
     if ! command -v "bun" &>/dev/null; then
         echo -n "Installing Bun..."
-        curl -fsSL https://bun.sh/install | bash &>/dev/null
+        curl -fsSL https://bun.sh/install | bash &>/dev/null &
         spinner $!
         wait
         echo "Success."
@@ -151,8 +150,8 @@ setup_bun() {
 
 setup_rust() {
     echo -n "Installing Rust..."
-    if ! command -v "rustrc" &>/dev/null; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null
+    if ! command -v "rustc" &>/dev/null; then  # Corrected "rustrc" to "rustc"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null &
         spinner $!
         wait
         echo "Success."
@@ -170,7 +169,7 @@ setup_wsl() {
 
 setup_shell() {
     echo "Checking for updates..."
-    sudo apt update &>/dev/null
+    sudo apt update &>/dev/null &
     spinner $!
     wait
     echo "Success."
@@ -183,9 +182,9 @@ setup_permissions() {
     local config=$dir/init/nanorc
     local active_config=/etc/nanorc
 
-    sudo chown -R $USER:$USER "$dir" || echo "Error: Could not modify permissions." && return 1
-    sudo cp $file $active_file || echo "Error: Could not copy .bashrc file." && return 1
-    sudo cp $config $active_config || echo "Error: Could not copy nanorc file." && return 1
+    sudo chown -R $USER:$USER "$dir" || { echo "Error: Could not modify permissions."; return 1; }
+    sudo cp $file $active_file || { echo "Error: Could not copy .bashrc file."; return 1; }
+    sudo cp $config $active_config || { echo "Error: Could not copy nanorc file."; return 1; }
 }
 
 execute() {
@@ -202,7 +201,7 @@ execute() {
 
 _setup() {
     dir=${1:-$HOME/g0dking}
-    local chkfile=$/root/.init_complete
+    local chkfile=/root/.init_complete  # Corrected "$/root" to "/root"
     clear
     echo "Initializing..."
     sleep 3
@@ -225,7 +224,7 @@ yn_prompt() {
         read -p "$prompt (y/n): " -r
         echo
         if [[ $REPLY =~ ^[Yy]([Ee][Ss])?$ ]]; then
-            local valid=1
+            valid=1  # Removed "local" from valid
             chk_if_run
         elif [[ $REPLY =~ ^[Nn][Oo]?$ ]]; then
             clear
