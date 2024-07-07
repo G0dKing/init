@@ -1,29 +1,25 @@
 #!/bin/bash
 
-initialize() {
-    local source=$1
-    local is_wsl=0
-    local dirs=(
-        "$source/tools"
-        "$source/init"
-        "$source/init/wsl"
-    )
-
-    if grep -qEi '(Microsoft|WSL)' /proc/version; then
-        is_wsl=1
-    fi
-
-    for dir in "${dirs[@]}"; do
-        if [ -d "$dir" ]; then
-            for file in "$dir"/*.{sh,conf,config}; do
-                [ -r "$file" ] && [ -f "$file" ] && . "$file"
-            done
-        elif [ "$dir" == "$source/init/wsl" ] && [ "$is_wsl" -eq 1 ]; then
-            for file in "$dir"/*.{sh,conf,config}; do
-                [ -r "$file" ] && [ -f "$file" ] && . "$file"
-            done
-        fi
-    done
+error() {
+	echo -e "${red}Error${nc}: $1" >/dev/stderr
+	return 1
 }
 
+initialize() {
+	local source=${1:-"$HOME"/g0dking}
+	local init_dir=$source/init
+	local wsl_dir=$init_dir/wsl
+	local tools_dir=$source/tools
 
+	local dirs=(
+		$init_dir
+		$wsl_dir
+		$tools_dir
+	)
+
+	for file in "${dirs[@]}"/*.{sh,conf,config}; do
+		if [ -f "$file" ]; then
+		 . $file || error "Could not source $file."
+		fi
+	done
+}

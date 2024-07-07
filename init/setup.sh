@@ -1,9 +1,33 @@
 #!/bin/bash
 
+set -euo pipefail
+
+# Configuration
+CONFIG_FILE="$HOME/.init_config"
+LOG_FILE="$HOME/.init_log"
+REPO_URL="https://github.com/g0dking/init.git"
+NVM_VERSION="v0.39.7"
+MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"
+
+# Load configuration if exists
+if [[ -f "$CONFIG_FILE" ]]; then
+    source "$CONFIG_FILE"
+fi
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+}
+
+error() {
+    log "ERROR: $1"
+    exit 1
+}
+
 chk_if_run() {
-    local chkfile=/root/.init_complete
+    local chkfile="/root/.init_complete"
     if [[ -f "$chkfile" ]]; then
-        echo "NOTE: The initialization script has already been run on this system. To re-run, delete '.init_complete' in the user's home directory."
+        log "NOTE: The initialization script has already been run on this system."
+        log "To re-run, delete '.init_complete' in the root user's home directory."
         return 1
     else
         _setup
@@ -11,23 +35,23 @@ chk_if_run() {
 }
 
 setup_repo() {
+    local dir="$HOME/g0dking"
     if [[ ! -d "$dir" ]]; then
-        local repo="https://github.com/g0dking/init.git"
-        local cmd="git clone $repo"
-        cd $HOME
-        echo -n "Repository not found. Cloning..."
-        $cmd &>/dev/null  # Removed exec and wait for background processes
-        sudo chown -R $USER:$USER init
+        log "Repository not found. Cloning..."
+        cd "$HOME" || error "Unable to change to home directory"
+        if ! git clone "$REPO_URL" &>/dev/null; then
+            error "Failed to clone repository"
+        fi
+        sudo chown -R "$USER:$USER" init
         sudo chmod -R 755 init
         cp -r init g0dking
         rm -rf init
-        echo "Success."
+        log "Repository setup successful."
     fi
 }
 
 setup_wsl_conf() {
     local wsl_conf="/etc/wsl.conf"
-
     if [[ ! -f "$wsl_conf" ]]; then
         sudo touch "$wsl_conf"
     fi
@@ -39,6 +63,7 @@ systemd = true
 [network]
 generateResolvConf = false
 EOF'
+    log "WSL configuration updated."
 }
 
 spinner() {
@@ -46,7 +71,7 @@ spinner() {
     local delay=0.1
     local spinstr='|/-\'
     tput civis
-    while ps -p "$pid" > /dev/null; do  # Corrected the while loop condition
+    while ps -p "$pid" > /dev/null; do
         local temp=${spinstr#?}
         printf " [%c]  " "$spinstr"
         spinstr=$temp${spinstr%"$temp"}
@@ -59,136 +84,87 @@ spinner() {
 
 setup_packages() {
     local packages=(
-        aria2
-        certbot
-        curl
-        dos2unix
-        fzf
-        git
-        grep
-        htop
-        jq
-        nano
-        neofetch
-        net-tools
-        nginx
-        python3-certbot-nginx
-        python3-full
-        ssh
-        tar
-        thefuck
-        tree
-        unzip
-        vim
-        wget
-        iptables
-        nmap
-        proxychains4
-        tor
+        aria2 certbot curl dos2unix fzf git grep htop jq nano neofetch
+        net-tools nginx python3-certbot-nginx python3-full ssh tar thefuck
+        tree unzip vim wget iptables nmap proxychains4 tor
     )
 
-    echo "Installing packages..."
-    echo
+    log "Updating package lists..."
+    sudo apt update &>/dev/null || error "Failed to update package lists"
 
-    for package in "${packages[@]}"; do
-        if ! command -v $package &>/dev/null; then
-            printf "Installing...    | $package\r"
-            sudo apt install -y $package &>/dev/null &
-            spinner $!
-            wait $!
-            printf "\rInstalled    | $package\n"
-        else
-            printf "\rInstalled    | $package\n"
-        fi
-    done
-    echo
-    echo "Successfully installed packages."
-    echo
+    log "Installing packages..."
+    sudo apt install -y "${packages[@]}" &>/dev/null || error "Failed to install packages"
+
+    log "Successfully installed packages."
 }
 
 setup_nvm() {
-    local url=https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh
-
-    echo -n "Installing Node Version Manager..."
-    if ! command -v "nvm" &>/dev/null; then
-        curl -o- $url &>/dev/null | bash &>/dev/null &
-        spinner $!
-        wait $!
-        echo "Success."
+    if ! command -v nvm &>/dev/null; then
+        log "Installing Node Version Manager..."
+        curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/$NVM_VERSION/install.sh" | bash &>/dev/null || error "Failed to install NVM"
+        log "Node Version Manager installed successfully."
     else
-        echo "Node Version Manager is already installed."
+        log "Node Version Manager is already installed."
     fi
 }
 
 setup_conda() {
-    if ! command -v "conda" &>/dev/null; then
-        echo -n "Installing MiniConda..."
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O Miniconda3-latest-Linux-x86_64.sh &>/dev/null &
-        spinner $!
-        wait
-        bash Miniconda3-latest-Linux-x86_64.sh -b &>/dev/null &
-        spinner $!
-        wait
-        rm -f Miniconda3-latest-Linux-x86_64.sh
-        echo "Success."
+    if ! command -v conda &>/dev/null; then
+        log "Installing MiniConda..."
+        wget "$MINICONDA_URL" -O miniconda.sh &>/dev/null || error "Failed to download MiniConda"
+        bash miniconda.sh -b &>/dev/null || error "Failed to install MiniConda"
+        rm -f miniconda.sh
+        log "MiniConda installed successfully."
     else
-        echo "MiniConda is already installed."
+        log "MiniConda is already installed."
     fi
 }
 
 setup_bun() {
-    if ! command -v "bun" &>/dev/null; then
-        echo -n "Installing Bun..."
-        curl -fsSL https://bun.sh/install | bash &>/dev/null &
-        spinner $!
-        wait
-        echo "Success."
+    if ! command -v bun &>/dev/null; then
+        log "Installing Bun..."
+        curl -fsSL https://bun.sh/install | bash &>/dev/null || error "Failed to install Bun"
+        log "Bun installed successfully."
     else
-        echo "Bun is already installed."
+        log "Bun is already installed."
     fi
 }
 
 setup_rust() {
-    echo -n "Installing Rust..."
-    if ! command -v "rustc" &>/dev/null; then  # Corrected "rustrc" to "rustc"
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null &
-        spinner $!
-        wait
-        echo "Success."
+    if ! command -v rustc &>/dev/null; then
+        log "Installing Rust..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y &>/dev/null || error "Failed to install Rust"
+        log "Rust installed successfully."
     else
-        echo "Rust is already installed."
+        log "Rust is already installed."
     fi
-    sleep 3
 }
 
 setup_wsl() {
-    if grep -Ei '(Microsoft|WSL)' /proc/version > /dev/null 2>&1; then
+    if grep -qi microsoft /proc/version || grep -qi wsl /proc/version; then
         setup_wsl_conf
     fi
 }
 
-setup_shell() {
-    echo "Checking for updates..."
-    sudo apt update &>/dev/null &
-    spinner $!
-    wait
-    echo "Success."
-    echo
-}
-
 setup_permissions() {
-    local file=$dir/init/dot.bashrc
-    local active_file=$HOME/.bashrc
-    local config=$dir/init/nanorc
-    local active_config=/etc/nanorc
+    local dir="$HOME/g0dking"
+    local file="$dir/init/dot.bashrc"
+    local active_file="$HOME/.bashrc"
+    local config="$dir/init/nanorc"
+    local active_config="/etc/nanorc"
 
-    sudo chown -R $USER:$USER "$dir" || { echo "Error: Could not modify permissions."; return 1; }
-    sudo cp $file $active_file || { echo "Error: Could not copy .bashrc file."; return 1; }
-    sudo cp $config $active_config || { echo "Error: Could not copy nanorc file."; return 1; }
+    sudo chown -R "$USER:$USER" "$dir" || error "Could not modify permissions"
+    sudo cp "$file" "$active_file" || error "Could not copy .bashrc file"
+    sudo cp "$config" "$active_config" || error "Could not copy nanorc file"
+    log "Permissions and configurations updated."
 }
+
+cleanup() {
+    log "Performing cleanup..."
+}
+
 
 execute() {
-    setup_shell
     setup_wsl
     setup_packages
     setup_repo
@@ -200,19 +176,18 @@ execute() {
 }
 
 _setup() {
-    dir=${1:-$HOME/g0dking}
-    local chkfile=/root/.init_complete  # Corrected "$/root" to "/root"
+    local chkfile="/root/.init_complete"
     clear
-    echo "Initializing..."
+    log "Initializing..."
     sleep 3
     execute
     sleep 5
     clear
-    echo "Operation Complete"
+    log "Operation Complete"
     sleep 2
-    echo "The configuration has been successfully applied. The shell session will now reload."
+    log "The configuration has been successfully applied. The shell session will now reload."
     sleep 5
-    sudo touch $chkfile
+    sudo touch "$chkfile"
     clear
     exec bash
 }
@@ -220,21 +195,22 @@ _setup() {
 yn_prompt() {
     local prompt="$1"
     local valid=0
-    while [ $valid -eq 0 ]; do
-        read -p "$prompt (y/n): " -r
+    while [[ $valid -eq 0 ]]; do
+        read -rp "$prompt (y/n): " reply
         echo
-        if [[ $REPLY =~ ^[Yy]([Ee][Ss])?$ ]]; then
-            valid=1  # Removed "local" from valid
-            chk_if_run
-        elif [[ $REPLY =~ ^[Nn][Oo]?$ ]]; then
-            clear
-            return 1
-        else
-            echo "Error: Selection invalid. Please enter [y]es or [n]o."
-        fi
+        case "$reply" in
+            [Yy]|[Yy][Ee][Ss]) valid=1; return 0 ;;
+            [Nn]|[Nn][Oo]) return 1 ;;
+            *) echo "Error: Invalid selection. Please enter [y]es or [n]o." ;;
+        esac
     done
 }
 
 setup() {
-    yn_prompt "Apply custom configurations to shell (cannot be reversed)?"
+    if yn_prompt "Apply custom configurations to shell (cannot be reversed)?"; then
+        chk_if_run
+    else
+        log "Operation cancelled."
+        exit 0
+    fi
 }
