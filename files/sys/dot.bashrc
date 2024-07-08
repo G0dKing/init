@@ -1,48 +1,59 @@
 #!/bin/bash
-# | ~/.bashrc | v. 10.0.3 | 7.6.24
+# | ~/.bashrc | v. 10.0.5 | 7.6.24
 
 error() {
         echo -e "${red}Error${nc}: $1" >/dev/stderr
         return 1
 }
 
-start_init() {
-    local source=${1:-"$HOME"/g0dking}
-    local scripts_dir="$source"/scripts
-    local config_dir="$source"/files/config
-    local functions_dir="$source"/functions
-
-
-    local dirs=(
-	    $config_dir
-	    $scripts_dir
-	    $functions_dir
-	)
-
-    for file in "${dirs[@]}"*/.{sh,config}; do
-        if [[ -f "$file" ]]; then
-	    . $file || error "Could not initialize ${file}."
-	    fi
-    done
-
-    set_colors
-    set_symbols
-    set_escape_codes
-    set_prompt
-    set_secrets
-    set_aliases
-    set_dns
+src_file() {
+    source $1 || error "Could not initialize $1."
 }
 
-pre_init() {
+start_init() {
 
 	alias c='clear'
 	alias up='sudo apt update && sudo apt full-upgrade -y'
 
 	[[ $- != *i* ]] && return
 
-	func_dir=$HOME/g0dking
-	start_init $func_dir
+    base_dir=/home/seed/g0dking
+    wsl_dir=$base_dir/files/wsl
+    config_dir=$base_dir/files/config
+    functions_dir=$base_dir/functions
+        
+    dirs=(
+	     $config_dir
+	     $wsl_dir
+	     $functions_dir
+	)
+
+    for dir in "${dirs[@]}"; do
+        for file in $dir/*.{sh,config}; do
+            if [[ -e "$file" ]]; then
+                src_file "$file"
+            fi
+        done
+    done
 }
 
-pre_init
+_nvm() {
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+}
+
+#------------
+# Execute
+#------------
+  start_init
+  wait
+  set_colors
+  set_symbols
+  set_escape_codes
+  set_prompt
+  set_secrets
+  set_aliases
+  set_dns
+
+  _nvm
