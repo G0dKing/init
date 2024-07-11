@@ -1,6 +1,5 @@
 #!/bin/bash
-# | ~/.bashrc | v. 10.1.1 | 7.8.24
-
+# | ~/.bashrc | v. 10.1.2 | 7.10.24
 
 error() {
         echo -e "${red}Error${nc}: $1" >/dev/stderr
@@ -13,21 +12,21 @@ src_file() {
 
 start_init() {
 
-	alias c='clear'
-	alias up='sudo apt update && sudo apt full-upgrade -y'
+    alias c='clear'
+    alias up='sudo apt update && sudo apt full-upgrade -y'
 
-	[[ $- != *i* ]] && return
+    [[ $- != *i* ]] && return
 
-    base_dir=/home/seed/g0dking
+    base_dir=$HOME/g0dking
     wsl_dir=$base_dir/files/wsl
     config_dir=$base_dir/files/config
     functions_dir=$base_dir/functions
         
     dirs=(
-	     $config_dir
-	     $wsl_dir
-	     $functions_dir
-	)
+         $config_dir
+         $wsl_dir
+         $functions_dir
+    )
 
     for dir in "${dirs[@]}"; do
         for file in $dir/*.{sh,config}; do
@@ -46,31 +45,33 @@ _nvm() {
 
 initial_load_output() {
     local vars=(
-        set_aliases
-        set_colors
-        set_prompt
-        set_secrets
-        set_aliases
-        set_dns
+        Aliases
+        Colors
+        Prompt
+        Secrets
+        Aliases
+    	Variables
+        Network
     )
 
-    for var in ${vars[@]}; do
-        local full=$var_complete
-        if [[ "$full" == true ]]; then
-            echo -e "${blue}${var}$ Initialized${nc}" || error "${var} Failed to Initialize"
-        fi
-    done
-
+    	echo
+    	for var in ${vars[@]}; do
+        	if [[ ! -z "$set_dns_complete" ]]; then
+            		echo -e "    ${blue}Initialized ${var}${nc}" || error "${var} Failed to Initialize"
+    	    		sleep 1        
+		fi
+	done
+	echo
+	echo -e "    ${green}Shell Initialized${nc}"
+	echo
 }
 
-#------------
-# Execute
-#------------
-  start_init
-  wait
-  set_colors
-  set_prompt
-  set_secrets
-  set_aliases
-  set_dns
-  _nvm
+start_init
+wait
+set_colors
+set_prompt
+set_secrets
+set_aliases
+set_dns
+_nvm
+initial_load_output
