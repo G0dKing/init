@@ -47,23 +47,24 @@ initial_load_output() {
     local vars=(
         Aliases
         Colors
+        Network
         Prompt
         Secrets
-        Aliases
     	Variables
-        Network
     )
 
     	echo
+        echo -e "${red}Initializing...${nc}"
     	for var in ${vars[@]}; do
         	if [[ ! -z "$set_dns_complete" ]]; then
-            		echo -e "    ${blue}Initialized ${var}${nc}" || error "${var} Failed to Initialize"
-    	    		sleep 1        
-		fi
-	done
-	echo
-	echo -e "    ${green}Shell Initialized${nc}"
-	echo
+               		echo -e "    ${yellow}${var}${nc}"
+    	    		sleep 0.5        
+		    fi
+	    done
+	    echo
+	    echo -e "${green}Complete${nc}"
+        sleep 1
+        clear
 }
 
 start_init
