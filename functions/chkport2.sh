@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+
+
 chkport_tools() {
     echo -e "${yellow}Installing Dependencies...${nc}"
     sudo apt update &>/dev/null
