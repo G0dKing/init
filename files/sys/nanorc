@@ -1,6 +1,6 @@
 # /etc/nanorc
 
- set boldtext
+ # set boldtext
  set casesensitive
  set cutfromcursor
  set historylog
@@ -11,7 +11,7 @@
  set tabstospaces
  set trimblanks
  set unix
- set multibuffer
+# set multibuffer
 
  bind ^C copy main
  bind ^V paste all
@@ -29,18 +29,18 @@
  bind ^Z undo main
  bind ^Y redo main
 
-# set stateflags
-# set titlecolor bold,white,magenta
-# set promptcolor black,yellow
-# set statuscolor bold,white,magenta
-# set errorcolor bold,white,red
-# set spotlightcolor black,orange
-# set selectedcolor lightwhite,cyan
-# set stripecolor ,yellow
-# set scrollercolor magenta
-# set numbercolor magenta
-# set keycolor lightmagenta
-# set functioncolor magenta
+ set stateflags
+ set titlecolor bold,white,magenta
+ set promptcolor black,yellow
+ set statuscolor bold,white,magenta
+ set errorcolor bold,white,red
+ set spotlightcolor black,orange
+ set selectedcolor lightwhite,cyan
+ set stripecolor yellow
+ set scrollercolor magenta
+ set numbercolor magenta
+ set keycolor lightmagenta
+ set functioncolor magenta
 # include "/usr/share/nano/*.nanorc"
 # extendsyntax python tabgives "    "
 # extendsyntax makefile tabgives "       "

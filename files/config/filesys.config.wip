@@ -1,0 +1,17 @@
+
+
+filesys() {
+    if [[ -z $set_colors_complete ]]; then
+        . $HOME/g0dking/files/config/colors.sh    fi
+    
+    local g="${green}"
+    local r="${red}"
+    local b="${blue}"
+    local lb="${cyan}"
+    local y="${yellow}"
+    local p="${purple}"
+    local w="${nc}"
+
+    alias 
+
+}
