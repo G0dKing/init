@@ -1,5 +1,5 @@
 #!/bin/bash
-# | ~/.bashrc | v. 10.1.2 | 7.10.24
+# | ~/.bashrc | v. 10.2.2 | 8.20.24
 
 error() {
         echo -e "${red}Error${nc}: $1" >/dev/stderr
@@ -43,6 +43,26 @@ _nvm() {
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 }
 
+_miniconda() {
+
+    # >>> conda initialize >>>
+    # !! Contents within this block are managed by 'conda init' !!
+    __conda_setup="$('/home/seed/.miniconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/home/seed/.miniconda/etc/profile.d/conda.sh" ]; then
+            . "/home/seed/.miniconda/etc/profile.d/conda.sh"
+        else
+            export PATH="/home/seed/.miniconda/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+# <<< conda initialize <<<
+
+    conda config --set auto_activate_base false
+}
+
 initial_load_output() {
     local vars=(
         Aliases
@@ -58,10 +78,22 @@ initial_load_output() {
     	for var in ${vars[@]}; do
         	if [[ ! -z "$set_dns_complete" ]]; then
                		echo -e "    ${yellow}${var}${nc}"
-    	    		sleep 0.5        
+    	    		sleep 0.3        
 		    fi
 	    done
-	    echo
+        
+        if command -v nvm >&/dev/null; then
+            echo
+            echo -e "   ${blue}Node Version Manager${nc}"
+            sleep 0.3
+        fi
+
+        if command -v conda >&/dev/null; then
+            echo -e "   ${blue}Miniconda${nc}"
+            sleep 0.3
+        fi
+
+        echo
 	    echo -e "${green}Complete${nc}"
         sleep 1
         clear
@@ -75,4 +107,7 @@ set_secrets
 set_aliases
 set_dns
 _nvm
+_miniconda
 initial_load_output
+
+
