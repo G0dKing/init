@@ -7,3 +7,6 @@
 
 # Reset SSH File Permissions
 alias ssh_permit='cd ~ && chmod 600 ~/.ssh/* && chmod 700 ~/.ssh && chmod 644 ~/.ssh/*.pub'
+# Login to GitHub Profile
+alias login_github='gh auth login'
+
