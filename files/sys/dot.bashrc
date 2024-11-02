@@ -15,19 +15,24 @@ src_file() {
 }
 
 start_init() {
+	local index=$HOME/g0dking/files/config/cmd_index
+
+	source $index
+
     alias c='clear'
     alias up='sudo apt update && sudo apt full-upgrade -y'
+
+	export EDITOR="code"
+	export VISUAL="code"
 
     [[ $- != *i* ]] && return
 
     base_dir=$HOME/g0dking
-    wsl_dir=$base_dir/files/wsl
     config_dir=$base_dir/files/config
     functions_dir=$base_dir/functions
 
     dirs=(
          $config_dir
-         $wsl_dir
          $functions_dir
     )
 

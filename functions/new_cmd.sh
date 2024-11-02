@@ -26,9 +26,9 @@ new_cmd() {
     if [ $# -eq 0 ]; then
         echo -e "${yellow}Enter a name for the alias:${nc}"
         read cmd_name
-        echo -e "${yellow}Enter the command executed by this alias:"
+        echo -e "${yellow}Enter the command executed by this alias:${nc}"
         read cmd_syntax
-        echo -e "${yellow}Enter a description for the alias:"
+        echo -e "${yellow}Enter a description for the alias:${nc}"
         read cmd_info
         echo
     fi
@@ -73,5 +73,6 @@ new_cmd() {
         return 0
     fi
 
+    # Notify Upon Success
     echo -e "${yellow}Custom alias ${blue}${cmd_name}${yellow} has been added to the command index!${nc}"
 }
