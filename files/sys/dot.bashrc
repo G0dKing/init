@@ -2,12 +2,22 @@
 
 # | ~/.bashrc | v. 10.5.0 | 10.31.24 | Ubuntu - WSL2
 
-
 # G0dking Shell Functions
 
 error() {
-        echo -e "${red}Error${nc}: $1" >/dev/stderr
-        return 1
+    echo -e "${red}Error${nc}: $1" >/dev/stderr
+    return 1
+}
+
+env_chk() {
+    env_dir=$HOME/g0dking
+    echo -e "${bold_yellow}Checking for updates..."
+    sleep 0.3
+    if [ -d "$env_dir" ]; then
+        cd $env_dir
+        git pull >&/dev/null
+        cd $HOME
+    fi
 }
 
 src_file() {
@@ -15,25 +25,21 @@ src_file() {
 }
 
 start_init() {
-	local index=$HOME/g0dking/files/config/cmd_index
-
-	source $index
-
-    alias c='clear'
-    alias up='sudo apt update && sudo apt full-upgrade -y'
-
-	export EDITOR="code"
-	export VISUAL="code"
 
     [[ $- != *i* ]] && return
 
-    base_dir=$HOME/g0dking
-    config_dir=$base_dir/files/config
-    functions_dir=$base_dir/functions
+    local env_dir=$HOME/g0dking
+    local index=$HOME/g0dking/files/config/cmd_index
+    local config_dir=$env_dir/files/config
+    local functions_dir=$env_dir/functions
+    alias c='clear'
+
+    env_chk
+    source $index
 
     dirs=(
-         $config_dir
-         $functions_dir
+        $config_dir
+        $functions_dir
     )
 
     for dir in "${dirs[@]}"; do
@@ -53,68 +59,80 @@ _nvm() {
 
 _miniconda() {
 
-# >>> conda initialize >>>
+    # >>> conda initialize >>>
     # !! Contents within this block are managed by 'conda init' !!
-    __conda_setup="$('/home/seed/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    __conda_setup="$('/home/seed/miniconda3/bin/conda' 'shell.bash' 'hook' 2>/dev/null)"
     if [ $? -eq 0 ]; then
         eval "$__conda_setup"
- export PATH="/home/seed/miniconda3/bin:$PATH"
+    else
+        if [ -f "/home/seed/miniconda3/etc/profile.d/conda.sh" ]; then
+            . "/home/seed/miniconda3/etc/profile.d/conda.sh"
+        else
+            export PATH="/home/seed/miniconda3/bin:$PATH"
         fi
+    fi
     unset __conda_setup
-# <<< conda initialize <<<
+    # <<< conda initialize <<<
 
 }
 
 ssh_github() {
-	eval "$(ssh-agent -s)" >&/dev/null
-	ssh-add ~/.ssh/id_ed25519 >&/dev/null
+    eval "$(ssh-agent -s)" >&/dev/null
+    ssh-add ~/.ssh/id_ed25519 >&/dev/null
 }
 
 initial_load_output() {
     local vars=(
         Aliases
-        Colors
+        Shortcuts
         Network
-        Prompt
+        Themes
         Secrets
-    	Variables
+        Variables
     )
 
-    	echo
-        echo -e "${red}Initializing ${purple}G0DKING${red} Shell${nc}"
-    	for var in ${vars[@]}; do
-        	if [[ ! -z "$set_dns_complete" ]]; then
-               		echo -e "    ${yellow}${var}${nc}"
-    	    		sleep 0.3
-		    fi
-	    done
+    echo
+    echo -e "${red}Initializing ${purple}G0DKING${red} Shell${nc}"
+    sleep 0.2
 
-        if command -v nvm >&/dev/null; then
-            echo
-            echo -e "   ${blue}Node Version Manager${nc}"
+    echo
+    echo -e "${bold_yellow}Loading:${nc}"
+
+    for var in ${vars[@]}; do
+        if [[ ! -z "$set_dns_complete" ]]; then
+            echo -e "    ${yellow}${var}${nc}"
             sleep 0.3
         fi
+    done
 
-        if command -v conda >&/dev/null; then
-            echo -e "   ${blue}Miniconda${nc}"
-            sleep 0.3
-        fi
+    echo
+    echo -e "${bold_yellow}Available Services:${nc}"
 
-		local test_cmd="ssh -T git@github.com"
-		if command -v "$test_cmd" >&/dev/null; then
-			echo -e "   ${blue}GitHub${nc}"
-			sleep 0.3
-		fi
-
+    if command -v nvm >&/dev/null; then
         echo
-	    echo -e "${green}Environment Initialized${nc}"
-		echo -e "Logged in as ${yellow}$USER${nc}"
-        sleep 1
-        clear
+        echo -e "${bold_blue}    Node Version Manager${nc}"
+        sleep 0.3
+    fi
+
+    if command -v conda >&/dev/null; then
+        echo -e "${bold_blue}    Miniconda${nc}"
+        sleep 0.3
+    fi
+
+    if command -v gh >&/dev/null; then
+        echo -e "${bold_blue}    GitHub${nc}"
+        sleep 0.3
+    fi
+
+    echo
+    echo -e "${green}SUCCESS${nc}"
+    sleep 0.5
+    echo -e "Logging in as:     ${red}$USER${nc}"
+    sleep 1
+    clear
 }
 
 start_init
-wait
 set_colors
 set_prompt
 set_secrets
@@ -124,5 +142,3 @@ _nvm
 _miniconda
 ssh_github
 initial_load_output
-
-
