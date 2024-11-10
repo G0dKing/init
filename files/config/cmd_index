@@ -1,12 +1,13 @@
-# CUSTOM COMMAND INDEX
-# This file must be located in /$HOME/g0dking/files/config to use the new_cmd function.
 
-
-# Command List
-# ------------
+#--------------
+# Command Index
+#--------------
 
 # Reset SSH File Permissions
 alias ssh_permit='cd ~ && chmod 600 ~/.ssh/* && chmod 700 ~/.ssh && chmod 644 ~/.ssh/*.pub'
+
 # Login to GitHub Profile
 alias login_github='gh auth login'
 
+# Modify the CLI prompt
+alias edit_prompt='nano /$HOME/g0dking/files/config/prompt.config'

@@ -10,7 +10,7 @@ rip_site() {
 
      if [[ -z "$site" ]]; then
           echo "Error: Must pass target website as argument."
-          echo "Example Usage: `rip_site https://example.com`"
+          echo "Example Usage: $(rip_site https://example.com)"
           return 1
      else
           eval $cmd $site
