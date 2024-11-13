@@ -9,13 +9,33 @@ error() {
     return 1
 }
 
-env_chk() {
+env_update() {
     env_dir=$HOME/g0dking
-    echo -e "${bold_yellow}Checking for updates..."
-    sleep 0.3
+
+    clear
+    echo -e "${red}G0DKING SHELL ENVIRONMENT${nc}"
+    echo -e "${purple}Alex Pariah${nc}"
+    echo
+    echo -e "${yellow}Initializing...${nc}"
+    echo
+
+    sudo apt update >&/dev/null || error "Could not update package repository."
+    echo -e "${yellow}Checking for updates...${nc}"
+
+    echo -e "${green}SUCCESS${nc}"
+    echo
+    echo -e "${yellow}Upgrading packages..."
+
+    sudo apt full-upgrade -y >&/dev/null || error "Could not upgrade packages."
+    echo -e "${green}SUCCESS${nc}"
+    echo
+
     if [ -d "$env_dir" ]; then
         cd $env_dir
-        git pull >&/dev/null
+        echo -e "${yellow}Syncing environment..."
+        git pull >&/dev/null || error "Could not update environment configuration."
+        echo -e "${green}SUCCESS${nc}"
+        echo
         cd $HOME
     fi
 }
@@ -32,10 +52,9 @@ start_init() {
     local index=$HOME/g0dking/files/config/cmd_index
     local config_dir=$env_dir/files/config
     local functions_dir=$env_dir/functions
-    alias c='clear'
 
-    env_chk
-    source $index
+    env_update
+    source $index || error "Failed to load command index."
 
     dirs=(
         $config_dir
@@ -58,7 +77,6 @@ _nvm() {
 }
 
 _miniconda() {
-
     # >>> conda initialize >>>
     # !! Contents within this block are managed by 'conda init' !!
     __conda_setup="$('/home/seed/miniconda3/bin/conda' 'shell.bash' 'hook' 2>/dev/null)"
@@ -73,7 +91,6 @@ _miniconda() {
     fi
     unset __conda_setup
     # <<< conda initialize <<<
-
 }
 
 ssh_github() {
@@ -91,44 +108,41 @@ initial_load_output() {
         Variables
     )
 
-    echo
-    echo -e "${red}Initializing ${purple}G0DKING${red} Shell${nc}"
-    sleep 0.2
-
-    echo
-    echo -e "${bold_yellow}Loading:${nc}"
+    echo -e "${yellow}Applying configurations...${nc}"
+    sleep 0.3
 
     for var in ${vars[@]}; do
         if [[ ! -z "$set_dns_complete" ]]; then
-            echo -e "    ${yellow}${var}${nc}"
-            sleep 0.3
+            echo -e "    ${bold_blue}${var}${nc}"
+            sleep 0.5
         fi
     done
 
+    echo -e "${green}SUCCESS${nc}"
     echo
-    echo -e "${bold_yellow}Available Services:${nc}"
+    echo -e "${yellow}Loading tools & services..."
+    sleep 0.3
 
     if command -v nvm >&/dev/null; then
-        echo
         echo -e "${bold_blue}    Node Version Manager${nc}"
-        sleep 0.3
+        sleep 0.5
     fi
 
     if command -v conda >&/dev/null; then
         echo -e "${bold_blue}    Miniconda${nc}"
-        sleep 0.3
+        sleep 0.5
     fi
 
     if command -v gh >&/dev/null; then
-        echo -e "${bold_blue}    GitHub${nc}"
-        sleep 0.3
+        echo -e "${bold_blue}    GitHub CLI${nc}"
+        sleep 0.5
     fi
 
-    echo
     echo -e "${green}SUCCESS${nc}"
-    sleep 0.5
-    echo -e "Logging in as:     ${red}$USER${nc}"
-    sleep 1
+    echo
+    sleep 2
+    echo -e "${yellow}Logging in as ${blue}%USER${purple}@${blue}$HOSTNAME{yellow}...${nc}"
+    sleep 3
     clear
 }
 
@@ -136,7 +150,6 @@ start_init
 set_colors
 set_prompt
 set_secrets
-set_aliases
 set_dns
 _nvm
 _miniconda
