@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# | ~/.bashrc | v. 10.5.0 | 10.31.24 | Ubuntu - WSL2
+# | ~/.bashrc | v. 11.0 | 11.13.24 | Ubuntu - WSL2
 
 # G0dking Shell Functions
 
@@ -19,13 +19,11 @@ env_update() {
     echo -e "${yellow}Initializing...${nc}"
     echo
 
-    sudo apt update >&/dev/null || error "Could not update package repository."
     echo -e "${yellow}Checking for updates...${nc}"
-
+    sudo apt update >&/dev/null || error "Could not update package repository."
     echo -e "${green}SUCCESS${nc}"
     echo
     echo -e "${yellow}Upgrading packages..."
-
     sudo apt full-upgrade -y >&/dev/null || error "Could not upgrade packages."
     echo -e "${green}SUCCESS${nc}"
     echo
@@ -141,7 +139,8 @@ initial_load_output() {
     echo -e "${green}SUCCESS${nc}"
     echo
     sleep 2
-    echo -e "${yellow}Logging in as ${blue}%USER${purple}@${blue}$HOSTNAME{yellow}...${nc}"
+    clear
+    echo -e "${yellow}Initialization Complete. Starting new shell...${nc}"
     sleep 3
     clear
 }
