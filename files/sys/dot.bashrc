@@ -96,7 +96,7 @@ initial_load_output() {
     sleep 0.2
 
     echo
-    echo -e "${bold_yellow}Loading:${nc}"
+    echo -e "${cyan}Loading:${nc}"
 
     for var in ${vars[@]}; do
         if [[ ! -z "$set_dns_complete" ]]; then
@@ -106,10 +106,9 @@ initial_load_output() {
     done
 
     echo
-    echo -e "${bold_yellow}Available Services:${nc}"
+    echo -e "${cyan}Available Services:${nc}"
 
     if command -v nvm >&/dev/null; then
-        echo
         echo -e "${bold_blue}    Node Version Manager${nc}"
         sleep 0.3
     fi
