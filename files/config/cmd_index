@@ -1,8 +1,7 @@
-
 #--------------
 # Command Index
 #--------------
-
+#--------------
 # Utility
 alias c='clear'
 alias mkdir='mkdir -p'
@@ -11,18 +10,17 @@ alias ll='ls'
 alias cp='cp -r'
 alias rm='rm -rf'
 alias echo='echo -e'
-
+#--------------
+# User Aliases
+alias edit_path='nano $HOME/g0dking/files/config/path.config'
+alias goto_config='cd $HOME/g0dking/files/config'
+alias goto_funcdir='cd $HOME/g0dking/functions'
 # --------------
-# Custom Aliases
-# --------------
-
-
+# Other Aliases
 # Reset SSH File Permissions
 alias ssh_permit='cd ~ && chmod 600 ~/.ssh/* && chmod 700 ~/.ssh && chmod 644 ~/.ssh/*.pub'
-
 # Login to GitHub Profile
 alias login_github='gh auth login'
-
 # Modify the CLI prompt
 alias edit_prompt='nano /$HOME/g0dking/files/config/prompt.config'
 
