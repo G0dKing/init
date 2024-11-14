@@ -1,8 +1,5 @@
 #!/bin/bash
 
-
-
-
 chkport_tools() {
     echo -e "${yellow}Installing Dependencies...${nc}"
     sudo apt update &>/dev/null
@@ -12,7 +9,7 @@ chkport_tools() {
 
 chkport_err() {
     local port=$1
-    
+
     if  [[ -z "$port" ]]; then
         echo -e "${red}ERROR${nc}: Must specify which port to check."
         return 1
@@ -23,7 +20,7 @@ chkport_err() {
 chkport() {
     local port=$1
     local cmd=$(sudo netstat -tvulnp | grep :"$port")
-    
+
     if ! command -v netstat &>/dev/null; then
         chkport_tools
     fi

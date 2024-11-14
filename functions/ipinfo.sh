@@ -9,9 +9,9 @@ ipinfo_check_dependencies() {
         if ! command -v "$cmd" &>/dev/null; then
             missing+=("$cmd")
             case "$cmd" in
-                ip) install_instructions+=("ip: Install 'iproute2' package.") ;;
-                curl) install_instructions+=("curl: Install 'curl' package.") ;;
-                wget) install_instructions+=("wget: Install 'wget' package.") ;;
+            ip) install_instructions+=("ip: Install 'iproute2' package.") ;;
+            curl) install_instructions+=("curl: Install 'curl' package.") ;;
+            wget) install_instructions+=("wget: Install 'wget' package.") ;;
             esac
         fi
     done
@@ -38,11 +38,11 @@ get_public_ip() {
         fi
 
         if [[ $public_ip != "error" && ! -z "$public_ip" ]]; then
-            echo -e "Public IPv4: ${yellow}${public_ip}${nc}"
+            echo -e "Public IP: ${yellow}${public_ip}${nc}"
             return
         fi
     done
-    echo -e "Public IPv4: $FAIL"
+    echo -e "Public IP: $FAIL"
 }
 
 get_public_ipv6() {
@@ -54,12 +54,12 @@ get_public_ipv6() {
             public_ipv6=$(wget --timeout=10 -qO- "$service" | grep -oP '(?<="ip":")[^"]*')
         fi
         if [[ ! -z "$public_ipv6" && "$public_ipv6" =~ : ]]; then
-            echo -e "Public IPv6: ${yellow}${public_ipv6}${nc}"
+            echo -e "IPv6: ${yellow}${public_ipv6}${nc}"
             echo
             return
         fi
     done
-    echo -e "Public IPv6: $FAIL"
+    echo -e "IPv6: $FAIL"
     echo
 }
 
@@ -67,8 +67,8 @@ get_local_and_ipv6() {
     local interface local_ip
     if is_wsl; then
         interface=$(ip -4 route list match 0/0 | awk '{print $5}' 2>/dev/null)
-        local_ip=$(ip -4 addr show "$interface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}' 2>/dev/null || echo "$FAIL")
-        echo -e "Local IPv4:  ${yellow}${local_ip}${nc}"
+        local_ip=$(ip -4 addr show "$interface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}' 2>/dev/null || echo -e "$FAIL" && return 1)
+        echo -e "Local IP:  ${yellow}${local_ip}${nc}"
         get_public_ipv6
     else
         interfaces=($(ip link | awk '/state UP/ {print $2}' | sed 's/://'))
@@ -85,17 +85,24 @@ get_local_and_ipv6() {
                 break
             done
         fi
+
         local_ip=$(ip -4 addr show "$interface" | grep -oP '(?<=inet\s)\d+(\.\d+){3}' 2>/dev/null || echo -e "$FAIL")
-        echo -e "Local  IPv4: $local_ip"
+        echo -e "Local  IP: $local_ip"
+
         # For non-WSL environments, attempt local IPv6 retrieval first
-        ipv6=$(ip -6 addr show "$interface" | grep -oP '(?<=inet6\s)[\da-f:]+(?=/)' | grep -vE '^fe80|^::1' | awk 'NR==1' || echo "$FAIL")
+        ipv6=$(ip -6 addr show "$interface" | grep -oP '(?<=inet6\s)[\da-f:]+(?=/)' | grep -vE '^fe80|^::1' | awk 'NR==1' || echo -e "$FAIL")
         if [[ $ipv6 == "$FAIL" ]]; then
             get_public_ipv6
         else
-            echo -e "Public IPv6: ${yellow}${ipv6}${nc}"
+            echo -e "IPv6: ${yellow}${ipv6}${nc}"
             echo
         fi
     fi
+}
+
+get_host_ip() {
+    host_ip=$(cmd.exe /c "ipconfig" 2>/dev/null | grep -A 5 'WIFI' | grep 'IPv4 Address' | awk '{print $NF}' | tr -d '\r' || echo -e "$FAIL")
+    echo -e "Host IP: ${yellow}${host_ip}${nc}"
 }
 
 get_other() {
@@ -112,17 +119,12 @@ fetch_ip() {
     echo
     get_other
     get_public_ip
+    get_host_ip
     get_local_and_ipv6
-
 }
 
 ipinfo() {
-    local file=$HOME/g0dking/init/colors.config
-    FAIL="${bg_red}UNAVAILABLE${nc}"
-
-    if [[ -z "$bg_red" ]]; then
-        . $file
-    fi
+    FAIL="${purple}N/A${nc}"
 
     ipinfo_check_dependencies
     fetch_ip
