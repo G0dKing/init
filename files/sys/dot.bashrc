@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# | ~/.bashrc | v. 11.0 | 11.13.24 | Ubuntu - WSL2
+# | ~/.bashrc | v. 12.0 | 11.17.24 | Ubuntu - WSL2
 
 # G0dking Shell Functions
 
@@ -11,13 +11,6 @@ error() {
 
 env_update() {
     env_dir=$HOME/g0dking
-
-    clear
-    echo -e "${red}G0DKING SHELL ENVIRONMENT${nc}"
-    echo -e "${purple}Alex Pariah${nc}"
-    echo
-    echo -e "${yellow}Initializing...${nc}"
-    echo
 
     echo -e "${yellow}Checking for updates...${nc}"
     sudo apt update >&/dev/null || error "Could not update package repository."
@@ -38,22 +31,16 @@ env_update() {
     fi
 }
 
-src_file() {
-    source $1 || error "Could not initialize $1."
-}
-
-start_init() {
+init_env() {
 
     [[ $- != *i* ]] && return
 
     local env_dir=$HOME/g0dking
-    local index=$HOME/g0dking/files/config/cmd_index
     local config_dir=$env_dir/files/config
     local functions_dir=$env_dir/functions
-
-    env_update
-    source $index || error "Failed to load command index."
-
+	
+	source $config_dir/cmd_index
+	
     dirs=(
         $config_dir
         $functions_dir
@@ -62,7 +49,7 @@ start_init() {
     for dir in "${dirs[@]}"; do
         for file in $dir/*.{sh,config}; do
             if [[ -e "$file" ]]; then
-                src_file "$file"
+                source "$file" || error "Failed to load $file"
             fi
         done
     done
@@ -106,17 +93,8 @@ initial_load_output() {
         Variables
     )
 
-<<<<<<< HEAD
-    echo
-    echo -e "${red}Initializing ${purple}G0DKING${red} Shell${nc}"
-    sleep 0.2
-
-    echo
-    echo -e "${cyan}Loading:${nc}"
-=======
     echo -e "${yellow}Applying configurations...${nc}"
     sleep 0.3
->>>>>>> 66843f672551c8dc266de2f18a649b3582c0fe75
 
     for var in ${vars[@]}; do
         if [[ ! -z "$set_dns_complete" ]]; then
@@ -127,12 +105,8 @@ initial_load_output() {
 
     echo -e "${green}SUCCESS${nc}"
     echo
-<<<<<<< HEAD
-    echo -e "${cyan}Available Services:${nc}"
-=======
     echo -e "${yellow}Loading tools & services..."
     sleep 0.3
->>>>>>> 66843f672551c8dc266de2f18a649b3582c0fe75
 
     if command -v nvm >&/dev/null; then
         echo -e "${bold_blue}    Node Version Manager${nc}"
@@ -150,20 +124,53 @@ initial_load_output() {
     fi
 
     echo -e "${green}SUCCESS${nc}"
-    echo
-    sleep 2
-    clear
-    echo -e "${yellow}Initialization Complete. Starting new shell...${nc}"
-    sleep 3
-    clear
 }
 
-start_init
-set_colors
-set_prompt
-set_secrets
-set_dns
-_nvm
-_miniconda
-ssh_github
-initial_load_output
+set_env() {
+	set_colors
+	set_prompt
+	set_secrets
+	set_dns
+	_nvm
+	_miniconda
+	ssh_github
+}
+
+usrprompt_env() {
+echo -n "Check for updates? (y/N): "
+    read -r choice
+    choice=${choice:-n}
+
+    case $choice in
+    [yY])
+		echo
+        env_update
+        set_env
+        initial_load_output
+		return 0
+        ;;
+    [nN]|"")
+		echo
+		initial_load_output
+        return 0
+        ;;
+	*)
+		echo
+		initial_load_output
+        return 0
+        ;;
+    esac
+}
+
+clear
+init_env
+set_env
+echo -e "${red}G0DKING SHELL"
+echo -e "${yellow}ver. 12.0${nc}"
+echo -e "${purple}Alex Pariah${nc}"
+echo
+usrprompt_env
+clear
+echo -e "${yellow}Logging in as: ${red}$USER${nc}"
+sleep 3
+clear
