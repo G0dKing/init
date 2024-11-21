@@ -32,15 +32,16 @@ env_update() {
 }
 
 init_env() {
-
     [[ $- != *i* ]] && return
+
+    export gk=g0dking
 
     local env_dir=$HOME/g0dking
     local config_dir=$env_dir/files/config
     local functions_dir=$env_dir/functions
-	
+
 	source $config_dir/cmd_index
-	
+
     dirs=(
         $config_dir
         $functions_dir
@@ -93,37 +94,38 @@ initial_load_output() {
         Variables
     )
 
-    echo -e "${yellow}Applying configurations...${nc}"
-    sleep 0.3
+    echo -e "Applying configurations...${nc}"
+    sleep 0.2
 
     for var in ${vars[@]}; do
         if [[ ! -z "$set_dns_complete" ]]; then
             echo -e "    ${bold_blue}${var}${nc}"
-            sleep 0.5
+            sleep 0.3
         fi
     done
 
     echo -e "${green}SUCCESS${nc}"
     echo
-    echo -e "${yellow}Loading tools & services..."
+    echo -e "Loading tools & services..."
     sleep 0.3
 
     if command -v nvm >&/dev/null; then
         echo -e "${bold_blue}    Node Version Manager${nc}"
-        sleep 0.5
+        sleep 0.3
     fi
 
     if command -v conda >&/dev/null; then
         echo -e "${bold_blue}    Miniconda${nc}"
-        sleep 0.5
+        sleep 0.3
     fi
 
     if command -v gh >&/dev/null; then
         echo -e "${bold_blue}    GitHub CLI${nc}"
-        sleep 0.5
+        sleep 0.3
     fi
 
     echo -e "${green}SUCCESS${nc}"
+    sleep 0.5
 }
 
 set_env() {
@@ -170,7 +172,14 @@ echo -e "${yellow}ver. 12.0${nc}"
 echo -e "${purple}Alex Pariah${nc}"
 echo
 usrprompt_env
-clear
-echo -e "${yellow}Logging in as: ${red}$USER${nc}"
+echo
+
+    if [ $USER == "root" ]; then
+        color=$red
+    else
+        color=$purpler
+    fi
+
+echo -e "Logging in as: ${color}$USER${nc}"
 sleep 3
 clear
