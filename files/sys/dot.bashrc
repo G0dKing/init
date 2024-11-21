@@ -35,6 +35,7 @@ init_env() {
     [[ $- != *i* ]] && return
 
     export gk=g0dking
+    alias python='/usr/bin/python3.12'
 
     local env_dir=$HOME/g0dking
     local config_dir=$env_dir/files/config

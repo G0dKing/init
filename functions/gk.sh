@@ -32,11 +32,13 @@ gk_sh() {
     gk_vars
     local file=$1
     code "$file".sh || nano "$file".sh
+    return 0
 }
 
 gk_conf() {
     gk_vars
     cd $confdir
+    return 0
 }
 
 #        gk_edit() {
