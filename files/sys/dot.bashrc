@@ -1,32 +1,46 @@
 #!/bin/bash
 
-# | ~/.bashrc | v. 12.0 | 11.17.24 | Ubuntu - WSL2
+# | ~/.bashrc | v. 12.5 | 11.21.24 | Ubuntu - WSL2
 
-# G0dking Shell Functions
+# G0dking Shell
 
+# Functions
 error() {
-    echo -e "${red}Error${nc}: $1" >/dev/stderr
+    echo -e "${red}Error${nc}: $1" >&/dev/stderr
     return 1
 }
+
+success() {
+    echo -e "${green}SUCCESS${nc}"
+    echo
+    sleep 0.5
+}
+
+isInstalled() {
+    if command -v $1 >&/dev/null; then
+       echo -e "${bold_blue}   $2${nc}"
+       sleep 0.3
+    fi
+ }
+
 
 env_update() {
     env_dir=$HOME/g0dking
 
-    echo -e "${yellow}Checking for updates...${nc}"
-    sudo apt update >&/dev/null || error "Could not update package repository."
-    echo -e "${green}SUCCESS${nc}"
-    echo
-    echo -e "${yellow}Upgrading packages..."
-    sudo apt full-upgrade -y >&/dev/null || error "Could not upgrade packages."
-    echo -e "${green}SUCCESS${nc}"
-    echo
+    echo -e "Updating package respositories..."
+    sudo apt update >&/dev/null && success || error "Could not update package repository."
+    echo -e "Upgrading packages..."
+    sudo apt full-upgrade -y >&/dev/null && success || error "Could not upgrade packages."
 
     if [ -d "$env_dir" ]; then
         cd $env_dir
-        echo -e "${yellow}Syncing environment..."
-        git pull >&/dev/null || error "Could not update environment configuration."
-        echo -e "${green}SUCCESS${nc}"
-        echo
+        echo -e "Syncing environment..."
+        git add . >&/dev/null
+        git commit -m "Synced on Startup" >&/dev/null
+        git branch sync >&/dev/null
+        git checkout sync >&/dev/null
+        git push origin sync >&/dev/null || error "Could not sync with remote repo."
+        git pull origin main >&/dev/null && success || error "Could not update environment configuration."
         cd $HOME
     fi
 }
@@ -35,13 +49,12 @@ init_env() {
     [[ $- != *i* ]] && return
 
     export gk=g0dking
-    alias python='/usr/bin/python3.12'
-
     local env_dir=$HOME/g0dking
     local config_dir=$env_dir/files/config
     local functions_dir=$env_dir/functions
 
 	source $config_dir/cmd_index
+    alias python='/usr/bin/python3.12'
 
     dirs=(
         $config_dir
@@ -49,7 +62,7 @@ init_env() {
     )
 
     for dir in "${dirs[@]}"; do
-        for file in $dir/*.{sh,config}; do
+        for file in $dir/*.{sh,config,conf}; do
             if [[ -e "$file" ]]; then
                 source "$file" || error "Failed to load $file"
             fi
@@ -80,22 +93,29 @@ _miniconda() {
     # <<< conda initialize <<<
 }
 
-ssh_github() {
+ssh_init() {
     eval "$(ssh-agent -s)" >&/dev/null
     ssh-add ~/.ssh/id_ed25519 >&/dev/null
+    ssh-add ~/.ssh/id_rsa >&/dev/null
 }
 
 initial_load_output() {
     local vars=(
         Aliases
-        Shortcuts
-        Network
-        Themes
+        Automations
+        Background Processes
+        Command Index
+        Color Scheme
+        Functions
+        Global Variables
+        Network Configurations
+        Scripts
         Secrets
-        Variables
+        Symbolic Links
+        User Prompt
     )
 
-    echo -e "Applying configurations...${nc}"
+    echo -e "Applying configurations..."
     sleep 0.2
 
     for var in ${vars[@]}; do
@@ -105,28 +125,18 @@ initial_load_output() {
         fi
     done
 
-    echo -e "${green}SUCCESS${nc}"
-    echo
+    success
+
     echo -e "Loading tools & services..."
     sleep 0.3
 
-    if command -v nvm >&/dev/null; then
-        echo -e "${bold_blue}    Node Version Manager${nc}"
-        sleep 0.3
-    fi
-
-    if command -v conda >&/dev/null; then
-        echo -e "${bold_blue}    Miniconda${nc}"
-        sleep 0.3
-    fi
-
-    if command -v gh >&/dev/null; then
-        echo -e "${bold_blue}    GitHub CLI${nc}"
-        sleep 0.3
-    fi
-
-    echo -e "${green}SUCCESS${nc}"
-    sleep 0.5
+    isInstalled docker Docker
+    isInstalled gh "GitHub CLI"
+    isInstalled conda Miniconda
+    isInstalled nvm "Node Version Manager"
+    isInstalled ollama Ollama
+    local py_ver=$(python --version)
+    isInstalled python3 $py_ver
 }
 
 set_env() {
@@ -136,7 +146,7 @@ set_env() {
 	set_dns
 	_nvm
 	_miniconda
-	ssh_github
+	ssh_init
 }
 
 usrprompt_env() {
@@ -148,7 +158,6 @@ echo -n "Check for updates? (y/N): "
     [yY])
 		echo
         env_update
-        set_env
         initial_load_output
 		return 0
         ;;
@@ -169,7 +178,7 @@ clear
 init_env
 set_env
 echo -e "${red}G0DKING SHELL"
-echo -e "${yellow}ver. 12.0${nc}"
+echo -e "${yellow}ver. 12.5${nc}"
 echo -e "${purple}Alex Pariah${nc}"
 echo
 usrprompt_env
