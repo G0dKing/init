@@ -4,9 +4,21 @@ call_flux() {
     local endpoint="https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev"
     local token=$HF_TOKEN
     local prompt=$1
-    local output="${2:-img.jpg}"
-    local ref=$3
+    local output="${2:-$(date +"%Y-%m-%d_%H:%M:%S").jpg}"
+    local ref=""
     local encoded_ref=""
+
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -r|--ref)
+                ref=$2
+                shift 2
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
 
     if [ -z "$prompt" ]; then
         error "Must include prompt as argument."
