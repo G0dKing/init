@@ -1,5 +1,10 @@
 #!/bin/bash
 
+error() {
+    echo -e "${bg_red}ERROR${nc}: $1" >&/dev/stderr
+    return 1
+}
+
 flux_help_msg() {
     echo -e "${yellow}USAGE:${green} `flux [PROMPT] --[OPTION]`${nc}"
     echo -e "       [-d, --directory]: Append contents of all text-containing files in a given directory to the prompt."
@@ -90,7 +95,6 @@ call_flux() {
 
     payload="{\"inputs\": \"$prompt\"}"
 
-    # If reference is provided, encode it
     if [ -n "$ref" ]; then
         encoded_ref=$(base64 -w 0 "$ref" 2>/dev/null)
         if [ $? -ne 0 ]; then
@@ -99,6 +103,8 @@ call_flux() {
         fi
         payload="{\"inputs\": \"$prompt\", \"ref\": \"$encoded_ref\"}"
     fi
+
+    echo -e "${cyan}Generating image...${nc}"
 
     curl -X POST "$endpoint" \
         -H "$auth" \
@@ -118,6 +124,5 @@ call_flux() {
 flux() {
     prompt="$1"
     echo
-    echo -e "${cyan}Generating image...${nc}"
     call_flux "$prompt"
 }
