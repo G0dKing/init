@@ -5,10 +5,27 @@ call_flux() {
     local token=$HF_TOKEN
     local prompt=$1
     local output="${2:-img.jpg}"
+    local ref=$3
+    local encoded_ref=""
 
-    if [ $# -eq 0 ]; then
+    if [ -z "$prompt" ]; then
         error "Must include prompt as argument."
         exit 1
+    fi
+
+    if [ -n "$ref" ]; then
+        encoded_ref=$(base64 -w 0 "$ref")
+    fi
+
+    if [ -n "$encoded_ref" ]; then
+        payload="{
+            \"inputs\": \"$prompt\",
+            \"image\": \"$encoded_ref\"
+        }"
+    else
+        payload="{
+            \"inputs\": \"$prompt\"
+        }"
     fi
 
     echo -e "Generating image..."
@@ -16,12 +33,12 @@ call_flux() {
     curl -X POST "$endpoint" \
         -H "Authorization: Bearer $token" \
         -H "Content-Type: application/json" \
-        -d "{\"inputs\": \"$prompt\"}" \
+        -d "$payload" \
         --output "$output" \
         --progress-bar
 
     if [ $? -ne 0 ]; then
-        error "API call failed." 
+        error "The API call failed. Check your connection and try again."
         exit 1
     fi
 
