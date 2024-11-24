@@ -33,6 +33,8 @@ env_update() {
 
 init_env() {
     [[ $- != *i* ]] && return
+    source /etc/os-release
+    export ID=$ID
 
     export gk=g0dking
     alias python='/usr/bin/python3.12'
