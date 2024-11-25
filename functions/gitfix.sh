@@ -1,8 +1,18 @@
 #!/bin/bash
 
-success() {
-    echo
-    echo -e "${green}Success!${nc}"
+check() {
+    if [ $? -eq 0 ]; then
+        echo -e "${green}SUCCESSFUL${nc}"
+    else
+        local err_output="${2:-}"
+        local err="${1:-FAILED}"
+        if [ -n "$err_output" ]; then
+            local error_msg="${red}Error:${nc} $err_output$"
+        else
+            local error_msg="${red}Error:${nc} $err"
+        echo -e "$error_msg"
+        fi
+    fi
     echo
 }
 
@@ -22,6 +32,8 @@ get_repo() {
 }
 
 gitfix() {
+    branch=$1
+
     dotenv="$HOME/.env"
     if [[ -f "$dotenv" ]]; then
         source "$dotenv"
@@ -35,14 +47,14 @@ gitfix() {
     fi
 
     repo=$(get_repo)
-    auth_git "$repo" "$username" "$email"
+    auth_git "$repo" "$username" "$email" "$branch"
 }
 
 auth_git() {
     repo=$1
     username=$2
     email=$3
-    branch="main"
+    branch="${4:-main}"
 
     if [[ ! -z "$GH_TOKEN" ]]; then
         echo "$GH_TOKEN" | gh auth login --with-token
@@ -53,22 +65,18 @@ auth_git() {
         git config --global credential.helper store
     fi
 
-    if [[ $repo != git@github.com:* ]]; then
+    if [[ $repo != git@github.com:$username* ]]; then
         repo_name=$(basename -s .git "$repo")
         git remote set-url origin "git@github.com:$username/$repo_name.git"
     fi
 
     current_branch=$(git branch --show-current)
     if [[ -z "$current_branch" ]]; then
-        git checkout -b "$branch"
+        current_branch=$branch
     fi
 
-    git push origin "$(git branch --show-current)"
-
-    if [ $? -eq 0 ]; then
-        success
-    else
-        error "Something went wrong. Aborting."
-        return 1
-    fi
-}
+    git checkout "$current_branch" >&/dev/null
+    git push -u origin "$current_branch" >&/dev/null
+    success
+    git branch main >&/dev/null
+}}
